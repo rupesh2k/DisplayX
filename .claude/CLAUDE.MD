@@ -1,9 +1,0 @@
-- Provide a **step-by-step plan** for implementing an MVP over a weekend.
-- Include **recommended frameworks, libraries, and plugins** for:
-  - Cross-platform development
-  - Video playback (local + streaming)
-  - Local caching
-  - Config and package parsing
-- Explain **how to structure the package and config.json**.
-- Explain **how to handle large videos and live streams** with signed URLs.
-- Provide a **development roadmap**: MVP vs full standard-compliant system.

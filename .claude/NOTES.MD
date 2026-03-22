@@ -1,7 +1,0 @@
-- Include **key considerations for long-term standardization**:
-- Offline-first strategy
-- Streaming large videos
-- Signed URL renewal
-- Cross-platform differences
-- MVP simplifications
-- How config.json becomes the standard description of any digital signage player
