@@ -1,0 +1,133 @@
+# DisplayX - Digital Signage Protocol
+
+Reference implementation of the DisplayX digital signage standard.
+
+## Quick Start
+
+### 1. Start Local Server
+
+```bash
+# Using Python 3
+python3 -m http.server 8080
+
+# Using Node.js (http-server)
+npx http-server -p 8080
+```
+
+### 2. Open Player
+
+```
+http://localhost:8080/player.html?config=http://localhost:8080/examples/config-minimal.json
+```
+
+## Project Structure
+
+```
+DisplayX/
+├── player.html           # Main player interface (full-screen playback)
+├── editor/              # Config editor (form-based)
+│   └── index.html
+├── preview/             # Preview mode (timeline visualization)
+│   └── index.html
+├── js/                  # JavaScript modules
+│   ├── EventEmitter.js  # Pub/sub for state management
+│   ├── ConfigFetcher.js # Config loading and validation
+│   ├── AssetCache.js    # IndexedDB asset caching
+│   ├── ScheduleEngine.js# Time-based playback scheduling
+│   └── player.js        # Main player orchestrator
+├── css/                 # Stylesheets
+│   └── player.css       # Player styles (design tokens)
+├── examples/            # Example config files
+│   └── config-minimal.json
+├── config.schema.json   # JSON Schema for validation
+└── package.json
+```
+
+## Config Format
+
+```json
+{
+  "version": "1.0",
+  "package_version": "2026-03-21T10:00:00Z",
+  "settings": {
+    "cache_size_gb": 5,
+    "poll_interval_sec": 300
+  },
+  "assets": [
+    {
+      "id": "logo",
+      "type": "image",
+      "url": "https://example.com/logo.png",
+      "cached": true
+    }
+  ],
+  "schedule": [
+    {
+      "time_range": ["09:00", "17:00"],
+      "playlist": ["logo"],
+      "durations_sec": [10],
+      "transition": {"type": "crossfade", "duration_ms": 300}
+    }
+  ],
+  "fallback": {
+    "asset_id": "logo",
+    "message": "Offline"
+  }
+}
+```
+
+## Features Implemented
+
+✅ Config loading and validation (JSON Schema)
+✅ Asset caching (IndexedDB, FIFO eviction)
+✅ Schedule engine (time-based playback)
+✅ Transition effects (crossfade, fade-to-black, hard-cut)
+✅ Offline mode (cached playback continues)
+✅ Error handling (retry/use cached)
+✅ Responsive design (mobile/tablet/desktop)
+✅ Accessibility (keyboard nav, ARIA, screen readers)
+✅ CSP security headers
+
+## Features In Progress
+
+🚧 Config editor (form-based UI)
+🚧 Preview mode (timeline visualization)
+🚧 Conditional display rules (date ranges, device tags)
+🚧 Analytics hooks (impression tracking)
+🚧 Health reporting (device status)
+
+## Browser Support
+
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+
+Requires:
+- IndexedDB API
+- ES6 Modules
+- CSS Grid/Flexbox
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run local server
+npm run dev
+
+# Validate config
+npm run validate examples/config-minimal.json
+```
+
+## Design Principles
+
+- **Offline-first:** Player caches assets and continues playback without network
+- **Config-driven:** All behavior controlled by config.json (no hardcoded logic)
+- **Standard-compliant:** JSON Schema validation ensures interoperability
+- **Accessible:** WCAG AA compliance (keyboard nav, screen readers, contrast)
+- **Minimal:** Vanilla JavaScript, no frameworks (reduces bundle size)
+
+## License
+
+MIT

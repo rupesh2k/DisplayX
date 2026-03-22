@@ -1,0 +1,8 @@
+- Draft a **formal JSON schema** for config.json suitable as a standard.
+- Include:
+- Asset types: image, video, live stream
+- Cached vs streamed flags
+- Schedule blocks
+- Playback settings
+- Metadata: version, package_version, timestamps
+- Include **examples** of both cached and streaming/live entries.

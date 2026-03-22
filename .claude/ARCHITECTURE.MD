@@ -1,0 +1,11 @@
+- Provide a **high-level architecture diagram** showing:
+  - Device (TV / Firestick / Apple TV)
+  - Local cache & playback engine
+  - Sync manager pulling packages from object store
+  - Cloud storage (signed URLs)
+  - Future admin console
+- Show **layered structure**:
+  - Platform-specific UI
+  - Shared core logic
+  - Platform adapters
+- Include **package flow**: config → assets → playback → refresh
