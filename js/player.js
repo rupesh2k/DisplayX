@@ -43,6 +43,7 @@ class Player {
       // Get config URL from query param
       const urlParams = new URLSearchParams(window.location.search);
       const configUrl = urlParams.get('config');
+      const clearCache = urlParams.get('clear-cache') === 'true';
 
       if (!configUrl) {
         throw new Error('Missing config URL parameter. Usage: player.html?config=https://...');
@@ -55,8 +56,28 @@ class Player {
       // Initialize IndexedDB
       await this.assetCache.init();
 
+      // Clear cache if requested
+      if (clearCache) {
+        this.loadingMessage.textContent = 'Clearing cache...';
+        await this.assetCache.clearCache();
+        console.log('Cache cleared successfully');
+      }
+
       // Fetch config
       const config = await this.configFetcher.init(configUrl);
+
+      // Check if config version changed (clear cache if different)
+      const lastConfigVersion = localStorage.getItem('displayx:config-version');
+      const currentConfigVersion = config.package_version;
+
+      if (lastConfigVersion && lastConfigVersion !== currentConfigVersion) {
+        console.log(`Config version changed (${lastConfigVersion} → ${currentConfigVersion}), clearing cache`);
+        this.loadingMessage.textContent = 'New config detected, clearing old cache...';
+        await this.assetCache.clearCache();
+      }
+
+      // Store current config version
+      localStorage.setItem('displayx:config-version', currentConfigVersion);
 
       // Cache assets
       this.loadingMessage.textContent = 'Caching assets...';
