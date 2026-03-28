@@ -13,7 +13,11 @@
     "config-driven",
     "offline-first"
   ],
-  "author": "",
+  "author": "rupesh2k",
+  "repository": {                                                                                                                             
+      "type": "git",                                                                                                                            
+      "url": "https://github.com/rupesh2k/DisplayX"                                                                                             
+    }, 
   "license": "MIT",
   "dependencies": {
     "ajv": "^8.12.0",
