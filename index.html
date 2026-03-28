@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DisplayX - Free, open-source digital signage platform that works on any device with a browser.">
+  <title>DisplayX - Open Source Digital Signage</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      color: white;
+      padding: 3rem 0;
+    }
+
+    .logo {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .tagline {
+      font-size: 1.5rem;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+
+    /* Main Content Card */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    /* Features Grid */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .feature {
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature h3 {
+      margin-bottom: 0.5rem;
+      color: #667eea;
+    }
+
+    /* Link Builder */
+    .link-builder {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .link-builder h2 {
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+
+    input[type="url"],
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input[type="url"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .output-box {
+      background: white;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      word-break: break-all;
+      position: relative;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+    }
+
+    .output-box.empty {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-block;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #10b981;
+    }
+
+    .btn-secondary:hover {
+      background: #059669;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .copy-btn {
+      background: #10b981;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    /* URL Shortener Guide */
+    .shortener-guide {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 2rem 0;
+    }
+
+    .shortener-guide h3 {
+      color: #d97706;
+      margin-bottom: 1rem;
+    }
+
+    .shortener-guide ol {
+      margin-left: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .shortener-guide li {
+      margin-bottom: 0.5rem;
+    }
+
+    .shortener-guide code {
+      background: white;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #d97706;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .action-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.3s;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+
+    .action-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-card h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    .action-card p {
+      opacity: 0.9;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      color: white;
+      padding: 2rem 0;
+      opacity: 0.9;
+    }
+
+    .footer a {
+      color: white;
+      text-decoration: underline;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #10b981;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: none;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+
+      .logo {
+        font-size: 2rem;
+      }
+
+      .tagline {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">📺 DisplayX</div>
+      <div class="tagline">Open Source Digital Signage</div>
+      <div class="subtitle">Transform any screen into a digital display • Free • Self-hosted • Works offline</div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+      <!-- Features -->
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">💰</div>
+          <h3>Completely Free</h3>
+          <p>No subscriptions, no hidden costs. Open source MIT license.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📴</div>
+          <h3>Offline-First</h3>
+          <p>Works without internet after initial load. Caches everything locally.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📱</div>
+          <h3>Universal</h3>
+          <p>Fire TV, Android TV, Smart TVs, Raspberry Pi, any browser.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⏰</div>
+          <h3>Smart Scheduling</h3>
+          <p>Time-based playlists. Different content at different times.</p>
+        </div>
+      </div>
+
+      <!-- Link Builder -->
+      <div class="link-builder">
+        <h2>🔗 Create Your Player Link</h2>
+        <p style="margin-bottom: 1.5rem; color: #6b7280;">
+          Enter your config URL to generate a ready-to-use player link for your devices.
+        </p>
+
+        <div class="form-group">
+          <label for="config-url">1. Your Config URL (GitHub raw URL recommended)</label>
+          <input
+            type="url"
+            id="config-url"
+            placeholder="https://raw.githubusercontent.com/username/repo/main/config.json"
+            oninput="generatePlayerLink()"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>2. Your Player Link (copy this to your device)</label>
+          <div class="output-box empty" id="player-link-output">
+            Enter your config URL above to generate player link...
+          </div>
+          <div class="btn-group">
+            <button class="btn copy-btn" onclick="copyPlayerLink()" id="copy-btn" disabled>
+              📋 Copy Link
+            </button>
+            <button class="btn copy-btn" onclick="openPlayer()" id="open-btn" disabled>
+              🚀 Open Player
+            </button>
+          </div>
+        </div>
+
+        <!-- URL Shortener Guide -->
+        <div class="shortener-guide">
+          <h3>💡 Make it Shorter (Optional)</h3>
+          <p>Long URLs are hard to type on devices. Create a short link:</p>
+          <ol>
+            <li>Copy your player link above</li>
+            <li>Go to <strong><a href="https://tinyurl.com" target="_blank" style="color: #d97706;">TinyURL.com</a></strong> or <strong><a href="https://bit.ly" target="_blank" style="color: #d97706;">Bit.ly</a></strong></li>
+            <li>Paste your long player link</li>
+            <li>Click "Shorten" to get a short link like: <code>https://tinyurl.com/abc123</code></li>
+            <li>Use the short link on your Fire TV, Smart TV, or Raspberry Pi</li>
+          </ol>
+          <p style="margin-top: 1rem;"><strong>Example:</strong> <code>https://tinyurl.com/352n94m5</code> → Opens DisplayX player</p>
+        </div>
+      </div>
+
+      <!-- Action Cards -->
+      <div class="actions">
+        <a href="editor/" class="action-card">
+          <h3>🎨 Config Editor</h3>
+          <p>Visual tool to create and edit your config.json file</p>
+        </a>
+        <a href="player.html?config=https://raw.githubusercontent.com/rupesh2k/DisplayX/main/examples/config-minimal.json" class="action-card">
+          <h3>▶️ Try Demo</h3>
+          <p>See DisplayX in action with example content</p>
+        </a>
+        <a href="https://github.com/rupesh2k/DisplayX#readme" target="_blank" class="action-card">
+          <h3>📚 Documentation</h3>
+          <p>Deployment guides, API reference, and more</p>
+        </a>
+      </div>
+
+      <!-- Quick Links -->
+      <div style="text-align: center; margin-top: 3rem;">
+        <h2 style="margin-bottom: 1rem;">📖 Learn More</h2>
+        <div class="btn-group" style="justify-content: center;">
+          <a href="QUICKSTART.md" class="btn">Quick Start Guide</a>
+          <a href="DEPLOYMENT-GUIDE.md" class="btn btn-secondary">Deployment Guide</a>
+          <a href="ROADMAP.md" class="btn">Roadmap</a>
+        </div>
+      </div>
+
+      <!-- GitHub -->
+      <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e5e7eb;">
+        <p style="margin-bottom: 1rem;">⭐ Star us on GitHub to show your support!</p>
+        <a href="https://github.com/rupesh2k/DisplayX" target="_blank" class="btn">
+          View on GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Made with ❤️ for the open source community</p>
+      <p style="margin-top: 0.5rem;">
+        <a href="LICENSE">MIT License</a> •
+        <a href="https://github.com/rupesh2k/DisplayX/issues">Report Issues</a> •
+        <a href="https://github.com/rupesh2k/DisplayX/discussions">Discussions</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Copied to clipboard! ✓</div>
+
+  <script>
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/$/, '');
+
+    function generatePlayerLink() {
+      const configUrl = document.getElementById('config-url').value.trim();
+      const output = document.getElementById('player-link-output');
+      const copyBtn = document.getElementById('copy-btn');
+      const openBtn = document.getElementById('open-btn');
+
+      if (configUrl && (configUrl.startsWith('http://') || configUrl.startsWith('https://'))) {
+        const playerLink = `${baseUrl}/player.html?config=${encodeURIComponent(configUrl)}`;
+        output.textContent = playerLink;
+        output.classList.remove('empty');
+        copyBtn.disabled = false;
+        openBtn.disabled = false;
+      } else {
+        output.textContent = 'Enter your config URL above to generate player link...';
+        output.classList.add('empty');
+        copyBtn.disabled = true;
+        openBtn.disabled = true;
+      }
+    }
+
+    function copyPlayerLink() {
+      const output = document.getElementById('player-link-output');
+      const link = output.textContent;
+
+      if (link && !output.classList.contains('empty')) {
+        navigator.clipboard.writeText(link).then(() => {
+          showToast();
+        }).catch(err => {
+          // Fallback for older browsers
+          const textarea = document.createElement('textarea');
+          textarea.value = link;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          showToast();
+        });
+      }
+    }
+
+    function openPlayer() {
+      const output = document.getElementById('player-link-output');
+      const link = output.textContent;
+
+      if (link && !output.classList.contains('empty')) {
+        window.open(link, '_blank');
+      }
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Auto-generate if URL has config parameter
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const config = params.get('config');
+      if (config) {
+        document.getElementById('config-url').value = config;
+        generatePlayerLink();
+      }
+    });
+  </script>
+</body>
+</html>
