@@ -1,10 +1,12 @@
 # DisplayX - Digital Signage Protocol
 
 Reference implementation of the DisplayX digital signage standard.
-## Working Product /Demo 
-Editor - https://rupesh2k.github.io/DisplayX/editor/
-Demo - https://rupesh2k.github.io/DisplayX/player.html?config=https://raw.githubusercontent.com/rupesh2k/DigitalSignageContent/main/config-2026-03-27%20(1).json
-Shorthen URL for Demo - https://tinyurl.com/352n94m5
+
+# Editor - https://rupesh2k.github.io/DisplayX/editor/
+
+# Demo - https://rupesh2k.github.io/DisplayX/player.html?config=https://raw.githubusercontent.com/rupesh2k/DigitalSignageContent/main/config-2026-03-27%20(1).json
+
+# Shorthen URL for Demo - https://tinyurl.com/352n94m5
 
 ## Quick Start
 
