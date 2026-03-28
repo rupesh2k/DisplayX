@@ -581,6 +581,30 @@ class ConfigEditor {
     }
   }
 
+  updateStorageMeter() {
+    // Calculate total storage used (approximate)
+    let totalBytes = 0;
+    this.assets.forEach(asset => {
+      // Rough estimate: assume 1MB per image, 10MB per video
+      if (asset.type === 'image') {
+        totalBytes += 1 * 1024 * 1024; // 1MB
+      } else if (asset.type === 'video') {
+        totalBytes += 10 * 1024 * 1024; // 10MB
+      }
+    });
+
+    const totalGB = totalBytes / (1024 * 1024 * 1024);
+    const cacheGB = this.settings.cache_size_gb || 5;
+    const percentage = Math.min((totalGB / cacheGB) * 100, 100);
+
+    if (this.storageValue) {
+      this.storageValue.textContent = `${totalGB.toFixed(2)} GB / ${cacheGB} GB`;
+    }
+    if (this.storageFill) {
+      this.storageFill.style.width = `${percentage}%`;
+    }
+  }
+
   loadConfig(config) {
     // Clear existing data
     this.assets = [];
@@ -612,9 +636,9 @@ class ConfigEditor {
     if (config.schedule && Array.isArray(config.schedule)) {
       config.schedule.forEach(block => {
         this.scheduleBlocks.push({
-          timeRange: block.time_range || ['00:00', '23:59'],
+          time_range: block.time_range || ['00:00', '23:59'],
           playlist: block.playlist || [],
-          durations: block.durations_sec || [],
+          durations_sec: block.durations_sec || [],
           transition: block.transition || { type: 'crossfade', duration_ms: 300 }
         });
       });
