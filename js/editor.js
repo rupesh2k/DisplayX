@@ -124,6 +124,11 @@ class ConfigEditor {
       this.exportConfig();
     });
 
+    // Import button
+    document.getElementById('import-btn').addEventListener('click', () => {
+      this.showImportDialog();
+    });
+
     // Close modals on escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -521,6 +526,104 @@ class ConfigEditor {
     URL.revokeObjectURL(url);
 
     alert('Config exported successfully! Upload it to your signage player.');
+  }
+
+  showImportDialog() {
+    const source = prompt(
+      'Import config from:\n\n1. Enter "file" to upload a JSON file\n2. Enter a URL to fetch config from GitHub/CDN\n\nExample URL:\nhttps://raw.githubusercontent.com/user/repo/main/config.json'
+    );
+
+    if (!source) return;
+
+    if (source.toLowerCase() === 'file') {
+      this.importFromFile();
+    } else if (source.startsWith('http://') || source.startsWith('https://')) {
+      this.importFromURL(source);
+    } else {
+      alert('Invalid input. Please enter "file" or a valid URL starting with http:// or https://');
+    }
+  }
+
+  importFromFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json,.json';
+
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const config = JSON.parse(text);
+        this.loadConfig(config);
+        alert('Config imported successfully!');
+      } catch (error) {
+        alert(`Failed to import config: ${error.message}`);
+      }
+    };
+
+    input.click();
+  }
+
+  async importFromURL(url) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const config = await response.json();
+      this.loadConfig(config);
+      alert('Config imported successfully from URL!');
+    } catch (error) {
+      alert(`Failed to fetch config from URL: ${error.message}`);
+    }
+  }
+
+  loadConfig(config) {
+    // Clear existing data
+    this.assets = [];
+    this.scheduleBlocks = [];
+
+    // Load settings
+    if (config.settings) {
+      this.settings = { ...this.settings, ...config.settings };
+      document.getElementById('cache-size').value = config.settings.cache_size_gb || 5;
+      document.getElementById('poll-interval').value = config.settings.poll_interval_sec || 300;
+      document.getElementById('health-url').value = config.settings.health_report_url || '';
+      document.getElementById('analytics-url').value = config.settings.analytics_webhook || '';
+    }
+
+    // Load assets
+    if (config.assets && Array.isArray(config.assets)) {
+      config.assets.forEach(asset => {
+        this.assets.push({
+          id: asset.id,
+          type: asset.type,
+          url: asset.url,
+          cached: asset.cached !== false, // Default true
+          file: null
+        });
+      });
+    }
+
+    // Load schedule blocks
+    if (config.schedule && Array.isArray(config.schedule)) {
+      config.schedule.forEach(block => {
+        this.scheduleBlocks.push({
+          timeRange: block.time_range || ['00:00', '23:59'],
+          playlist: block.playlist || [],
+          durations: block.durations_sec || [],
+          transition: block.transition || { type: 'crossfade', duration_ms: 300 }
+        });
+      });
+    }
+
+    // Refresh UI
+    this.renderAssets();
+    this.renderSchedule();
+    this.updateStorageMeter();
   }
 }
 

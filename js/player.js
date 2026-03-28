@@ -205,7 +205,9 @@ class Player {
       this.assetVideo.style.display = 'block';
       this.assetVideo.src = assetUrl;
       this.assetVideo.loop = false;
-      this.assetVideo.muted = false;
+
+      // Start muted for autoplay compatibility (Fire TV, mobile browsers)
+      this.assetVideo.muted = true;
 
       // Apply transition
       if (shouldAnimate) {
@@ -215,8 +217,25 @@ class Player {
       // Start playback
       try {
         await this.assetVideo.play();
+
+        // Unmute after successful playback start
+        // Small delay ensures playback is stable
+        setTimeout(() => {
+          this.assetVideo.muted = false;
+        }, 100);
       } catch (error) {
         console.error('Video playback error:', error);
+
+        // If unmuted playback fails, try muted
+        if (!this.assetVideo.muted) {
+          console.warn('Retrying video playback muted');
+          this.assetVideo.muted = true;
+          try {
+            await this.assetVideo.play();
+          } catch (retryError) {
+            console.error('Muted playback also failed:', retryError);
+          }
+        }
       }
     }
 
