@@ -39,7 +39,7 @@ DisplayX transforms any screen into a digital display. Perfect for retail, offic
 
 ### 1. Try the Demo
 ```
-https://rupesh2k.github.io/DisplayX/player.html?config=Chttps://raw.githubusercontent.com/rupesh2k/DigitalSignageContent/main/config-2026-03-27%20(1).json
+https://rupesh2k.github.io/DisplayX/player.html?config=https://raw.githubusercontent.com/rupesh2k/DigitalSignageContent/main/config-2026-03-27%20(1).json
 ```
 
 ### 2. Create Your Config

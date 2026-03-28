@@ -14,254 +14,548 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
       line-height: 1.6;
-      color: #1f2937;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
+    body.light-mode {
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    body.light-mode .navbar {
+      background: rgba(248, 250, 252, 0.8);
+      border-bottom-color: #e2e8f0;
+    }
+
+    body.light-mode .card,
+    body.light-mode .capability-card,
+    body.light-mode .step,
+    body.light-mode .footer-card {
+      background: #ffffff;
+      border-color: #e2e8f0;
+      color: #1e293b;
+    }
+
+    body.light-mode .capability-card h3,
+    body.light-mode .step-title,
+    body.light-mode .footer-card h3 {
+      color: #1e293b;
+    }
+
+    body.light-mode .capability-card p,
+    body.light-mode .step-description,
+    body.light-mode .footer-card p {
+      color: #64748b;
+    }
+
+    body.light-mode input[type="url"] {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
+
+    body.light-mode .output-box {
+      background: #ffffff;
+      color: #6366f1;
+    }
+
+    body.light-mode .footer {
+      background: #f1f5f9;
+      border-top-color: #e2e8f0;
+    }
+
+    body.light-mode .footer-section a {
+      color: #64748b;
+    }
+
+    body.light-mode .logo {
+      color: #4f46e5;
+    }
+
+    body.light-mode .nav-links a {
+      color: #475569;
+    }
+
+    body.light-mode .nav-links a:hover {
+      color: #6366f1;
+    }
+
+    body.light-mode .hero-content h1 {
+      color: #0f172a;
+    }
+
+    body.light-mode .hero-content .highlight {
+      color: #6366f1;
+    }
+
+    body.light-mode .hero-content p {
+      color: #475569;
+    }
+
+    body.light-mode .section-title {
+      color: #0f172a;
+    }
+
+    body.light-mode .link-builder-title {
+      color: #0f172a;
+    }
+
+    body.light-mode .link-builder-subtitle {
+      color: #64748b;
+    }
+
+    body.light-mode .theme-toggle {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
+
+    body.light-mode .theme-toggle:hover {
+      background: #cbd5e1;
     }
 
     /* Header */
-    .header {
-      text-align: center;
-      color: white;
-      padding: 3rem 0;
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 4rem;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e293b;
     }
 
     .logo {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-
-    .tagline {
       font-size: 1.5rem;
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
+      font-weight: 700;
+      color: #818cf8;
     }
 
-    .subtitle {
-      font-size: 1.1rem;
-      opacity: 0.8;
-    }
-
-    /* Main Content Card */
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 3rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-
-    /* Features Grid */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    .nav-links {
+      display: flex;
       gap: 2rem;
-      margin: 2rem 0;
+      list-style: none;
     }
 
-    .feature {
-      text-align: center;
-      padding: 1.5rem;
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.3s;
     }
 
-    .feature-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+    .nav-links a:hover {
+      color: #818cf8;
     }
 
-    .feature h3 {
-      margin-bottom: 0.5rem;
-      color: #667eea;
+    .theme-toggle {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
 
-    /* Link Builder */
-    .link-builder {
-      background: #f9fafb;
-      border-radius: 12px;
-      padding: 2rem;
-      margin: 2rem 0;
+    .theme-toggle:hover {
+      background: #334155;
     }
 
-    .link-builder h2 {
-      color: #667eea;
-      margin-bottom: 1rem;
+    /* Hero Section */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 6rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
     }
 
-    .form-group {
+    .hero-content h1 {
+      font-size: 3.5rem;
+      line-height: 1.1;
       margin-bottom: 1.5rem;
     }
 
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #374151;
+    .hero-content .highlight {
+      color: #818cf8;
     }
 
-    input[type="url"],
-    input[type="text"] {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #e5e7eb;
+    .hero-content p {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
       border-radius: 8px;
       font-size: 1rem;
-      transition: border-color 0.3s;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
     }
 
-    input[type="url"]:focus,
-    input[type="text"]:focus {
+    .btn-primary:hover {
+      background: #4f46e5;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #e2e8f0;
+      padding: 1rem 2rem;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      border-color: #6366f1;
+      color: #818cf8;
+    }
+
+    .hero-image {
+      position: relative;
+    }
+
+    .hero-image img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Capabilities Section */
+    .capabilities {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
+
+    .section-label {
+      color: #6366f1;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .capability-card {
+      background: #1e293b;
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      transition: all 0.3s;
+    }
+
+    .capability-card:hover {
+      transform: translateY(-4px);
+      border-color: #6366f1;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+    }
+
+    .capability-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .capability-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      color: #f1f5f9;
+    }
+
+    .capability-card p {
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* Link Builder Section */
+    .link-builder {
+      max-width: 800px;
+      margin: 6rem auto;
+      padding: 0 2rem;
+    }
+
+    .link-builder-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .link-builder-subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 3rem;
+    }
+
+    .step {
+      background: #1e293b;
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      margin-bottom: 2rem;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 1.2rem;
+      color: #f1f5f9;
+    }
+
+    .step-description {
+      color: #94a3b8;
+      margin-bottom: 1rem;
+      padding-left: 2.5rem;
+    }
+
+    .input-group {
+      position: relative;
+      padding-left: 2.5rem;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 1rem;
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    input[type="url"]:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    input[type="url"]::placeholder {
+      color: #475569;
     }
 
     .output-box {
-      background: white;
-      border: 2px solid #667eea;
+      background: #0f172a;
+      border: 2px solid #6366f1;
       border-radius: 8px;
       padding: 1rem;
       font-family: 'Courier New', monospace;
-      font-size: 0.9rem;
+      color: #818cf8;
       word-break: break-all;
-      position: relative;
+      margin-bottom: 1rem;
       min-height: 60px;
       display: flex;
       align-items: center;
     }
 
     .output-box.empty {
-      color: #9ca3af;
-      font-style: italic;
+      color: #475569;
     }
 
-    .btn {
-      background: #667eea;
+    .button-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-copy {
+      background: #6366f1;
       color: white;
-      border: none;
       padding: 0.75rem 1.5rem;
+      border: none;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s;
-      display: inline-block;
-      text-decoration: none;
-      text-align: center;
     }
 
-    .btn:hover {
-      background: #5568d3;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    .btn-copy:hover:not(:disabled) {
+      background: #4f46e5;
     }
 
-    .btn-secondary {
-      background: #10b981;
+    .btn-copy:disabled {
+      background: #334155;
+      cursor: not-allowed;
+      opacity: 0.5;
     }
 
-    .btn-secondary:hover {
-      background: #059669;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-
-    .copy-btn {
-      background: #10b981;
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-    }
-
-    /* URL Shortener Guide */
-    .shortener-guide {
-      background: #fef3c7;
-      border-left: 4px solid #f59e0b;
-      padding: 1.5rem;
+    .shortener-box {
+      background: #422006;
+      border: 1px solid #f59e0b;
       border-radius: 8px;
-      margin: 2rem 0;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
     }
 
-    .shortener-guide h3 {
-      color: #d97706;
-      margin-bottom: 1rem;
-    }
-
-    .shortener-guide ol {
-      margin-left: 1.5rem;
-      margin-top: 1rem;
-    }
-
-    .shortener-guide li {
+    .shortener-box h4 {
+      color: #fbbf24;
       margin-bottom: 0.5rem;
     }
 
-    .shortener-guide code {
-      background: white;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      color: #d97706;
+    .shortener-box p {
+      color: #fde68a;
+      font-size: 0.95rem;
+      line-height: 1.6;
     }
 
-    /* Action Buttons */
-    .actions {
+    .shortener-box a {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    /* Footer Cards */
+    .footer-cards {
+      max-width: 1200px;
+      margin: 6rem auto 4rem;
+      padding: 0 2rem;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin: 2rem 0;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
     }
 
-    .action-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 2rem;
+    .footer-card {
+      background: #1e293b;
+      padding: 2.5rem;
       border-radius: 12px;
-      text-align: center;
-      transition: transform 0.3s;
-      cursor: pointer;
-      text-decoration: none;
-      display: block;
+      border: 1px solid #334155;
+      transition: all 0.3s;
     }
 
-    .action-card:hover {
+    .footer-card:hover {
+      border-color: #6366f1;
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
     }
 
-    .action-card h3 {
-      margin-bottom: 0.5rem;
+    .footer-card h3 {
       font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
     }
 
-    .action-card p {
-      opacity: 0.9;
+    .footer-card p {
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .footer-card a {
+      color: #818cf8;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .footer-card a:hover {
+      color: #6366f1;
     }
 
     /* Footer */
     .footer {
+      background: #0a0f1a;
+      padding: 3rem 2rem;
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 3rem;
+    }
+
+    .footer-section h4 {
+      color: #f1f5f9;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section li {
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-section a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section a:hover {
+      color: #818cf8;
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 2rem auto 0;
+      padding-top: 2rem;
+      border-top: 1px solid #1e293b;
       text-align: center;
-      color: white;
-      padding: 2rem 0;
-      opacity: 0.9;
+      color: #64748b;
     }
 
-    .footer a {
-      color: white;
-      text-decoration: underline;
-    }
-
-    /* Toast Notification */
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -273,6 +567,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       display: none;
       animation: slideIn 0.3s ease-out;
+      z-index: 1000;
     }
 
     .toast.show {
@@ -290,152 +585,221 @@
       }
     }
 
-    @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
+    /* Responsive */
+    @media (max-width: 968px) {
+      .navbar {
+        padding: 1rem 2rem;
       }
 
-      .card {
-        padding: 1.5rem;
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 3rem 2rem;
       }
 
-      .logo {
-        font-size: 2rem;
+      .hero-content h1 {
+        font-size: 2.5rem;
       }
 
-      .tagline {
-        font-size: 1.2rem;
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .capability-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <div class="logo">📺 DisplayX</div>
-      <div class="tagline">Open Source Digital Signage</div>
-      <div class="subtitle">Transform any screen into a digital display • Free • Self-hosted • Works offline</div>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo">DisplayX</div>
+    <ul class="nav-links">
+      <li><a href="#link-builder">Get Started</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="editor/">Editor</a></li>
+      <li><a href="https://github.com/rupesh2k/DisplayX">GitHub</a></li>
+    </ul>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>
+        DisplayX:<br>
+        <span class="highlight">Open Source</span><br>
+        <span class="highlight">Digital</span><br>
+        Signage
+      </h1>
+      <p>Transform any screen into a high-end digital signage. Fullscreen mode, layout, offline-first architecture - completely free and open source.</p>
+      <div class="hero-buttons">
+        <a href="#link-builder" class="btn-primary">Get Started Free</a>
+        <a href="player.html?config=https://raw.githubusercontent.com/rupesh2k/DisplayX/main/examples/config-minimal.json" class="btn-secondary">Live Preview</a>
+      </div>
     </div>
-
-    <!-- Main Card -->
-    <div class="card">
-      <!-- Features -->
-      <div class="features">
-        <div class="feature">
-          <div class="feature-icon">💰</div>
-          <h3>Completely Free</h3>
-          <p>No subscriptions, no hidden costs. Open source MIT license.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">📴</div>
-          <h3>Offline-First</h3>
-          <p>Works without internet after initial load. Caches everything locally.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">📱</div>
-          <h3>Universal</h3>
-          <p>Fire TV, Android TV, Smart TVs, Raspberry Pi, any browser.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">⏰</div>
-          <h3>Smart Scheduling</h3>
-          <p>Time-based playlists. Different content at different times.</p>
-        </div>
+    <div class="hero-image">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%;">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop" alt="Restaurant Digital Menu Board" style="object-fit: cover; border-radius: 8px; width: 100%; height: 180px;">
+        <img src="https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=400&h=300&fit=crop" alt="Healthcare Information Display" style="object-fit: cover; border-radius: 8px; width: 100%; height: 180px;">
+        <img src="https://images.unsplash.com/photo-1557821552-17105176677c?w=400&h=300&fit=crop" alt="Retail Digital Signage" style="object-fit: cover; border-radius: 8px; width: 100%; height: 180px;">
+        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=300&fit=crop" alt="Event Schedule Display" style="object-fit: cover; border-radius: 8px; width: 100%; height: 180px;">
       </div>
+    </div>
+  </section>
 
-      <!-- Link Builder -->
-      <div class="link-builder">
-        <h2>🔗 Create Your Player Link</h2>
-        <p style="margin-bottom: 1.5rem; color: #6b7280;">
-          Enter your config URL to generate a ready-to-use player link for your devices.
-        </p>
+  <!-- Link Builder Section -->
+  <section class="link-builder" id="link-builder">
+    <h2 class="link-builder-title">Create Your Player Link</h2>
+    <p class="link-builder-subtitle">Follow these simple steps to generate your custom DisplayX player link</p>
 
-        <div class="form-group">
-          <label for="config-url">1. Your Config URL (GitHub raw URL recommended)</label>
-          <input
-            type="url"
-            id="config-url"
-            placeholder="https://raw.githubusercontent.com/username/repo/main/config.json"
-            oninput="generatePlayerLink()"
-          >
-        </div>
-
-        <div class="form-group">
-          <label>2. Your Player Link (copy this to your device)</label>
-          <div class="output-box empty" id="player-link-output">
-            Enter your config URL above to generate player link...
-          </div>
-          <div class="btn-group">
-            <button class="btn copy-btn" onclick="copyPlayerLink()" id="copy-btn" disabled>
-              📋 Copy Link
-            </button>
-            <button class="btn copy-btn" onclick="openPlayer()" id="open-btn" disabled>
-              🚀 Open Player
-            </button>
-          </div>
-        </div>
-
-        <!-- URL Shortener Guide -->
-        <div class="shortener-guide">
-          <h3>💡 Make it Shorter (Optional)</h3>
-          <p>Long URLs are hard to type on devices. Create a short link:</p>
-          <ol>
-            <li>Copy your player link above</li>
-            <li>Go to <strong><a href="https://tinyurl.com" target="_blank" style="color: #d97706;">TinyURL.com</a></strong> or <strong><a href="https://bit.ly" target="_blank" style="color: #d97706;">Bit.ly</a></strong></li>
-            <li>Paste your long player link</li>
-            <li>Click "Shorten" to get a short link like: <code>https://tinyurl.com/abc123</code></li>
-            <li>Use the short link on your Fire TV, Smart TV, or Raspberry Pi</li>
-          </ol>
-          <p style="margin-top: 1rem;"><strong>Example:</strong> <code>https://tinyurl.com/352n94m5</code> → Opens DisplayX player</p>
-        </div>
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <h3 class="step-title">Input Your Config URL</h3>
       </div>
-
-      <!-- Action Cards -->
-      <div class="actions">
-        <a href="editor/" class="action-card">
-          <h3>🎨 Config Editor</h3>
-          <p>Visual tool to create and edit your config.json file</p>
-        </a>
-        <a href="player.html?config=https://raw.githubusercontent.com/rupesh2k/DisplayX/main/examples/config-minimal.json" class="action-card">
-          <h3>▶️ Try Demo</h3>
-          <p>See DisplayX in action with example content</p>
-        </a>
-        <a href="https://github.com/rupesh2k/DisplayX#readme" target="_blank" class="action-card">
-          <h3>📚 Documentation</h3>
-          <p>Deployment guides, API reference, and more</p>
-        </a>
-      </div>
-
-      <!-- Quick Links -->
-      <div style="text-align: center; margin-top: 3rem;">
-        <h2 style="margin-bottom: 1rem;">📖 Learn More</h2>
-        <div class="btn-group" style="justify-content: center;">
-          <a href="QUICKSTART.md" class="btn">Quick Start Guide</a>
-          <a href="DEPLOYMENT-GUIDE.md" class="btn btn-secondary">Deployment Guide</a>
-          <a href="ROADMAP.md" class="btn">Roadmap</a>
-        </div>
-      </div>
-
-      <!-- GitHub -->
-      <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e5e7eb;">
-        <p style="margin-bottom: 1rem;">⭐ Star us on GitHub to show your support!</p>
-        <a href="https://github.com/rupesh2k/DisplayX" target="_blank" class="btn">
-          View on GitHub
-        </a>
+      <p class="step-description">Enter the URL of your config.json file (GitHub raw URL recommended for best results)</p>
+      <div class="input-group">
+        <input
+          type="url"
+          id="config-url"
+          placeholder="https://raw.githubusercontent.com/username/repo/main/config.json"
+          oninput="generatePlayerLink()"
+        >
       </div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-      <p>Made with ❤️ for the open source community</p>
-      <p style="margin-top: 0.5rem;">
-        <a href="LICENSE">MIT License</a> •
-        <a href="https://github.com/rupesh2k/DisplayX/issues">Report Issues</a> •
-        <a href="https://github.com/rupesh2k/DisplayX/discussions">Discussions</a>
-      </p>
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <h3 class="step-title">Your Generated Player Link</h3>
+      </div>
+      <p class="step-description">Copy this link and use it on your Fire TV, Smart TV, Raspberry Pi, or any browser</p>
+      <div class="input-group">
+        <div class="output-box empty" id="player-link-output">
+          Enter your config URL above to generate player link...
+        </div>
+        <div class="button-group">
+          <button class="btn-copy" onclick="copyPlayerLink()" id="copy-btn" disabled>
+            📋 Copy
+          </button>
+          <button class="btn-copy" onclick="openPlayer()" id="open-btn" disabled>
+            🚀 Open
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <h3 class="step-title">Shorten URL (Optional)</h3>
+      </div>
+      <p class="step-description">Long URLs can be difficult to type on devices like Fire TV. We recommend using a URL shortener for easier access.</p>
+      <div class="input-group">
+        <div class="shortener-box">
+          <h4>💡 How to Shorten Your Link</h4>
+          <p>
+            1. Copy your player link above<br>
+            2. Visit <a href="https://tinyurl.com" target="_blank">TinyURL.com</a> or <a href="https://bit.ly" target="_blank">Bit.ly</a><br>
+            3. Paste and create a short link like: <strong>tinyurl.com/abc123</strong><br>
+            4. Use the short link on your display devices
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Capabilities Section -->
+  <section class="capabilities" id="features">
+    <div class="section-label">SHOWCASING OUR PERFORMANCE</div>
+    <h2 class="section-title">Curated Capabilities</h2>
+    <div class="capability-grid">
+      <div class="capability-card">
+        <div class="capability-icon">💰</div>
+        <h3>Completely Free</h3>
+        <p>No subscriptions, no hidden costs. Open source MIT license with freedom to use commercially.</p>
+      </div>
+      <div class="capability-card">
+        <div class="capability-icon">📴</div>
+        <h3>Offline-first</h3>
+        <p>Works without internet after initial load. All assets cached locally using IndexedDB for reliable playback.</p>
+      </div>
+      <div class="capability-card">
+        <div class="capability-icon">📱</div>
+        <h3>Universal</h3>
+        <p>Fire TV, Android TV, Smart TVs, Raspberry Pi, tablets - any device with a modern web browser.</p>
+      </div>
+      <div class="capability-card">
+        <div class="capability-icon">⏰</div>
+        <h3>Smart Scheduling</h3>
+        <p>Time-based playlists with custom durations, transitions, and smooth content ordering logic, all automatic.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Cards -->
+  <div class="footer-cards">
+    <div class="footer-card">
+      <h3>Config Editor</h3>
+      <p>Visual tool to create and edit your config.json file with a drag-and-drop interface.</p>
+      <a href="editor/">Open Editor →</a>
+    </div>
+    <div class="footer-card">
+      <h3>Try Demo</h3>
+      <p>Experience DisplayX in action with our example configuration and sample content.</p>
+      <a href="player.html?config=https://raw.githubusercontent.com/rupesh2k/DisplayX/main/examples/config-minimal.json">View Demo →</a>
+    </div>
+    <div class="footer-card">
+      <h3>Documentation</h3>
+      <p>Comprehensive guides for deployment, configuration, and advanced features.</p>
+      <a href="DEPLOYMENT-GUIDE.md">Read Docs →</a>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Digital Signage</h4>
+        <ul>
+          <li><a href="player.html">Player</a></li>
+          <li><a href="editor/">Config Editor</a></li>
+          <li><a href="examples/config-minimal.json">Sample Config</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Start</h4>
+        <ul>
+          <li><a href="QUICKSTART.md">Quick Start Guide</a></li>
+          <li><a href="DEPLOYMENT-GUIDE.md">Deploy Guide</a></li>
+          <li><a href="CACHE-MANAGEMENT.md">Cache Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Development</h4>
+        <ul>
+          <li><a href="https://github.com/rupesh2k/DisplayX">GitHub</a></li>
+          <li><a href="ROADMAP.md">Roadmap</a></li>
+          <li><a href="https://github.com/rupesh2k/DisplayX/issues">Report Issues</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="config.schema.json">JSON Schema</a></li>
+          <li><a href="LICENSE">MIT License</a></li>
+          <li><a href="https://github.com/rupesh2k/DisplayX/discussions">Discussions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Made with ❤️ for the open source community • <a href="https://github.com/rupesh2k/DisplayX" style="color: #818cf8;">⭐ Star on GitHub</a></p>
+    </div>
+  </footer>
 
   <!-- Toast Notification -->
   <div class="toast" id="toast">Copied to clipboard! ✓</div>
@@ -470,8 +834,7 @@
       if (link && !output.classList.contains('empty')) {
         navigator.clipboard.writeText(link).then(() => {
           showToast();
-        }).catch(err => {
-          // Fallback for older browsers
+        }).catch(() => {
           const textarea = document.createElement('textarea');
           textarea.value = link;
           document.body.appendChild(textarea);
@@ -499,6 +862,40 @@
         toast.classList.remove('show');
       }, 3000);
     }
+
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('theme-btn');
+
+      body.classList.toggle('light-mode');
+
+      if (body.classList.contains('light-mode')) {
+        btn.textContent = '🌙 Dark';
+        localStorage.setItem('theme', 'light');
+      } else {
+        btn.textContent = '☀️ Light';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    // Load saved theme on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      const btn = document.getElementById('theme-btn');
+
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        btn.textContent = '🌙 Dark';
+      }
+
+      // Auto-generate player link if config parameter exists
+      const params = new URLSearchParams(window.location.search);
+      const config = params.get('config');
+      if (config) {
+        document.getElementById('config-url').value = config;
+        generatePlayerLink();
+      }
+    });
 
     // Auto-generate if URL has config parameter
     window.addEventListener('DOMContentLoaded', () => {
