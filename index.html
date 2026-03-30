@@ -507,6 +507,74 @@
       color: #6366f1;
     }
 
+    /* Sponsor Section */
+    .sponsor-section {
+      max-width: 800px;
+      margin: 6rem auto 4rem;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    .sponsor-container h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #e2e8f0;
+    }
+
+    .sponsor-container p {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .sponsor-card {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+      background: #1e293b;
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+
+    .sponsor-card iframe {
+      border-radius: 8px;
+    }
+
+    .sponsor-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #ec4899 0%, #ef4444 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 1rem;
+    }
+
+    .sponsor-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4);
+    }
+
+    body.light-mode .sponsor-container h2 {
+      color: #0f172a;
+    }
+
+    body.light-mode .sponsor-container p {
+      color: #475569;
+    }
+
+    body.light-mode .sponsor-card {
+      background: #ffffff;
+      border-color: #e2e8f0;
+    }
+
     /* Footer */
     .footer {
       background: #0a0f1a;
@@ -606,6 +674,27 @@
 
       .capability-grid {
         grid-template-columns: 1fr;
+      }
+
+      .sponsor-section {
+        margin: 3rem auto 2rem;
+      }
+
+      .sponsor-container h2 {
+        font-size: 1.5rem;
+      }
+
+      .sponsor-container p {
+        font-size: 1rem;
+      }
+
+      .sponsor-card {
+        padding: 1rem;
+      }
+
+      .sponsor-card iframe {
+        width: 100%;
+        height: auto;
       }
     }
   </style>
@@ -759,6 +848,19 @@
       <a href="DEPLOYMENT-GUIDE.md">Read Docs →</a>
     </div>
   </div>
+
+  <!-- Sponsor Section -->
+  <section class="sponsor-section">
+    <div class="sponsor-container">
+      <h2>Help Fund This Project</h2>
+      <p>DisplayX is free and open source, built for the community. Your contribution helps fund development, add new features, and keep this project thriving.</p>
+      <p class="sponsor-text">
+        <a href="https://github.com/sponsors/rupesh2k" target="_blank" rel="noopener noreferrer" class="sponsor-link">
+          💖 Sponsor on GitHub
+        </a>
+      </p>
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer class="footer">
