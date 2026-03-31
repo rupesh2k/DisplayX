@@ -12,6 +12,7 @@ class Player {
     this.scheduleEngine = null;
     this.isOffline = false;
     this.currentAsset = null;
+    this.hls = null; // HLS.js instance for livestream playback
 
     // UI elements
     this.loadingScreen = document.getElementById('loading-screen');
@@ -237,6 +238,91 @@ class Player {
           }
         }
       }
+
+    } else if (asset.type === 'live_stream') {
+      // Hide image, show video (livestream uses video element)
+      this.assetImage.style.display = 'none';
+      this.assetVideo.style.display = 'block';
+
+      // Cleanup previous HLS instance if exists
+      if (this.hls) {
+        this.hls.destroy();
+        this.hls = null;
+      }
+
+      // Check if HLS.js is supported
+      if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+        // Use HLS.js for browsers that don't have native HLS support
+        this.hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: true,
+          backBufferLength: 90
+        });
+
+        // Load HLS stream
+        this.hls.loadSource(assetUrl);
+        this.hls.attachMedia(this.assetVideo);
+
+        // Wait for manifest to be parsed
+        await new Promise((resolve, reject) => {
+          this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            console.log('HLS manifest parsed successfully');
+            resolve();
+          });
+
+          this.hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+              console.error('Fatal HLS error:', data);
+              reject(new Error(`HLS Error: ${data.type} - ${data.details}`));
+            } else {
+              console.warn('Non-fatal HLS error:', data);
+            }
+          });
+        });
+
+      } else if (this.assetVideo.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS support (Safari, iOS)
+        this.assetVideo.src = assetUrl;
+        await new Promise((resolve, reject) => {
+          this.assetVideo.addEventListener('loadedmetadata', resolve, { once: true });
+          this.assetVideo.addEventListener('error', reject, { once: true });
+        });
+
+      } else {
+        throw new Error('HLS playback not supported on this browser');
+      }
+
+      // Configure video for livestream playback
+      this.assetVideo.loop = false;
+      this.assetVideo.muted = true; // Start muted for autoplay compatibility
+
+      // Apply transition
+      if (shouldAnimate) {
+        this.assetVideo.style.animation = `${transitionType} ${transitionDuration}ms ease-in-out`;
+      }
+
+      // Start playback
+      try {
+        await this.assetVideo.play();
+
+        // Unmute after successful playback start
+        setTimeout(() => {
+          this.assetVideo.muted = false;
+        }, 100);
+      } catch (error) {
+        console.error('Livestream playback error:', error);
+
+        // If unmuted playback fails, try muted
+        if (!this.assetVideo.muted) {
+          console.warn('Retrying livestream playback muted');
+          this.assetVideo.muted = true;
+          try {
+            await this.assetVideo.play();
+          } catch (retryError) {
+            console.error('Muted playback also failed:', retryError);
+          }
+        }
+      }
     }
 
     this.currentAsset = asset;
@@ -323,6 +409,10 @@ class Player {
    * Cleanup resources
    */
   destroy() {
+    if (this.hls) {
+      this.hls.destroy();
+      this.hls = null;
+    }
     if (this.scheduleEngine) {
       this.scheduleEngine.destroy();
     }

@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "package_version": "2026-03-30T10:00:00Z",
+  "settings": {
+    "cache_size_gb": 5,
+    "poll_interval_sec": 300,
+    "health_report_url": "https://monitor.example.com/health",
+    "analytics_webhook": "https://analytics.example.com/impressions"
+  },
+  "assets": [
+    {
+      "id": "logo",
+      "type": "image",
+      "url": "https://via.placeholder.com/1920x1080/2563eb/ffffff?text=DisplayX+Logo",
+      "cached": true
+    },
+    {
+      "id": "apple-test-stream",
+      "type": "live_stream",
+      "url": "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8",
+      "cached": false
+    },
+    {
+      "id": "big-buck-bunny-hls",
+      "type": "live_stream",
+      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "cached": false
+    },
+    {
+      "id": "cbsn-news",
+      "type": "live_stream",
+      "url": "https://cbsn-us.cbsistatic.com/cbsn/master.m3u8",
+      "cached": false
+    }
+  ],
+  "schedule": [
+    {
+      "time_range": ["00:00", "23:59"],
+      "playlist": ["logo", "apple-test-stream", "big-buck-bunny-hls", "cbsn-news"],
+      "durations_sec": [5, 30, 30, 30],
+      "transition": {
+        "type": "crossfade",
+        "duration_ms": 300
+      }
+    }
+  ],
+  "fallback": {
+    "asset_id": "logo",
+    "message": "Offline - Showing Cached Content"
+  }
+}

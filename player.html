@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: blob: data:; media-src 'self' https: blob:; connect-src 'self' https:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: blob: data:; media-src 'self' https: blob:; connect-src 'self' https: blob:;">
   <title>DisplayX Player</title>
   <link rel="stylesheet" href="css/player.css">
 </head>
@@ -43,6 +43,9 @@
     <img id="asset-image" class="asset" alt="Signage content" style="display: none;">
     <video id="asset-video" class="asset" aria-label="Signage content" style="display: none;"></video>
   </div>
+
+  <!-- HLS.js for livestream support -->
+  <script src="node_modules/hls.js/dist/hls.min.js"></script>
 
   <script type="module" src="js/player.js"></script>
 </body>
