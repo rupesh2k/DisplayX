@@ -10,21 +10,38 @@ Reference implementation of the DisplayX digital signage standard.
 
 ## Quick Start
 
-### 1. Start Local Server
+### Option 1: Static Mode (No Server)
 
 ```bash
-# Using Python 3
+# 1. Start Local Server
 python3 -m http.server 8080
+# OR: npx http-server -p 8080
 
-# Using Node.js (http-server)
-npx http-server -p 8080
-```
-
-### 2. Open Player
-
-```
+# 2. Open Player
 http://localhost:8080/player.html?config=http://localhost:8080/examples/config-minimal.json
 ```
+
+### Option 2: Server Mode (with DisplayX-Server)
+
+```bash
+# 1. Open Setup Page
+http://localhost:8080/setup.html
+
+# 2. Enter Your Server Details
+# - Server URL: https://your-displayx-server.com
+# - Device Name: Lobby Display
+
+# 3. Device Registers and Redirects to Player
+# Config is now managed from your server dashboard
+```
+
+**Server Mode Features:**
+- Central device management
+- Remote config updates
+- Device health monitoring
+- Analytics and reporting
+
+[Learn more about DisplayX-Server](https://github.com/rupesh2k/DisplayX-Server)
 
 ## Project Structure
 
@@ -40,6 +57,7 @@ DisplayX/
 │   ├── ConfigFetcher.js # Config loading and validation
 │   ├── AssetCache.js    # IndexedDB asset caching
 │   ├── ScheduleEngine.js# Time-based playback scheduling
+│   ├── Heartbeat.js     # Server heartbeat (device health)
 │   └── player.js        # Main player orchestrator
 ├── css/                 # Stylesheets
 │   └── player.css       # Player styles (design tokens)
@@ -93,6 +111,8 @@ DisplayX/
 ✅ Responsive design (mobile/tablet/desktop)
 ✅ Accessibility (keyboard nav, ARIA, screen readers)
 ✅ CSP security headers
+✅ Server mode (device registration, heartbeat, remote config)
+✅ HLS livestream support (hls.js)
 
 ## Features In Progress
 
@@ -133,6 +153,29 @@ npm run validate examples/config-minimal.json
 - **Standard-compliant:** JSON Schema validation ensures interoperability
 - **Accessible:** WCAG AA compliance (keyboard nav, screen readers, contrast)
 - **Minimal:** Vanilla JavaScript, no frameworks (reduces bundle size)
+- **Mode-agnostic:** Works with static configs OR central server (backward compatible)
+
+## Server Mode vs Static Mode
+
+| Feature | Static Mode | Server Mode |
+|---------|-------------|-------------|
+| **Setup** | Point player to JSON URL | One-time device registration |
+| **Config Updates** | Manual (re-deploy JSON file) | Automatic (server pushes updates) |
+| **Device Management** | None | Dashboard with device list, status |
+| **Analytics** | None | Playback tracking, impressions |
+| **Multi-device** | Manage each separately | Centralized control |
+| **Offline** | ✅ Works offline | ✅ Works offline (cached config) |
+| **Best for** | Single screen, DIY setups | Multiple screens, businesses |
+
+**Both modes use the same player code** - choose what fits your needs.
+
+## Server Options
+
+1. **Build your own** - Use config.schema.json as the API contract
+2. **DisplayX-Server** - Official server implementation ([GitHub](https://github.com/rupesh2k/DisplayX-Server))
+   - Self-hosted (open core, coming Q3 2026)
+   - Managed hosting ($20/month flat rate, coming Q3 2026)
+3. **Static JSON hosting** - Current method (GitHub Pages, S3, etc.)
 
 ## License
 

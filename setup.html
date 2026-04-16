@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https:;">
+  <title>DisplayX Setup</title>
+  <link rel="stylesheet" href="css/player.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .setup-container {
+      max-width: 500px;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 40px;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .subtitle {
+      color: #718096;
+      margin: 0 0 30px 0;
+      font-size: 15px;
+    }
+
+    .setup-field {
+      margin-bottom: 24px;
+    }
+
+    .setup-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 14px;
+    }
+
+    .setup-field input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+
+    .setup-field input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .setup-field small {
+      display: block;
+      margin-top: 6px;
+      color: #a0aec0;
+      font-size: 13px;
+    }
+
+    .setup-button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .setup-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .setup-button:active {
+      transform: translateY(0);
+    }
+
+    .setup-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .setup-error {
+      padding: 12px 16px;
+      background: #fff5f5;
+      color: #c53030;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: none;
+      font-size: 14px;
+      border-left: 4px solid #fc8181;
+    }
+
+    .setup-success {
+      padding: 12px 16px;
+      background: #f0fff4;
+      color: #276749;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: none;
+      font-size: 14px;
+      border-left: 4px solid #68d391;
+    }
+
+    .setup-skip {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .setup-skip p {
+      margin: 0 0 8px 0;
+      color: #718096;
+      font-size: 14px;
+    }
+
+    .setup-skip a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .setup-skip a:hover {
+      color: #764ba2;
+    }
+
+    .spinner-inline {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="setup-container">
+    <div class="logo">DX</div>
+    <h1>DisplayX Setup</h1>
+    <p class="subtitle">Connect this device to your DisplayX server.</p>
+
+    <form id="setupForm">
+      <div class="setup-field">
+        <label for="serverUrl">Server URL</label>
+        <input
+          type="url"
+          id="serverUrl"
+          placeholder="https://your-server.com"
+          required
+          autocomplete="url"
+        >
+        <small>The URL of your DisplayX server (including https://)</small>
+      </div>
+
+      <div class="setup-field">
+        <label for="deviceName">Device Name</label>
+        <input
+          type="text"
+          id="deviceName"
+          placeholder="Lobby Display"
+          required
+          autocomplete="off"
+        >
+        <small>A friendly name to identify this device in your dashboard</small>
+      </div>
+
+      <button type="submit" class="setup-button" id="submitBtn">
+        Connect Device
+      </button>
+
+      <div id="error" class="setup-error"></div>
+      <div id="success" class="setup-success"></div>
+    </form>
+
+    <div class="setup-skip">
+      <p>Don't have a server?</p>
+      <a href="player.html?config=examples/config-minimal.json">
+        Use static config instead →
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('setupForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorEl = document.getElementById('error');
+    const successEl = document.getElementById('success');
+    const serverUrlInput = document.getElementById('serverUrl');
+    const deviceNameInput = document.getElementById('deviceName');
+
+    // Generate default device name
+    const defaultName = `Display-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    deviceNameInput.placeholder = defaultName;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const serverUrl = serverUrlInput.value.trim().replace(/\/$/, ''); // Remove trailing slash
+      const deviceName = deviceNameInput.value.trim() || defaultName;
+
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+
+      // Disable form during submission
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-inline"></span>Connecting...';
+
+      try {
+        // Register device with server
+        console.log('Registering device:', deviceName, 'with server:', serverUrl);
+
+        const response = await fetch(`${serverUrl}/api/v1/devices/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: deviceName,
+            metadata: {
+              screen_width: window.screen.width,
+              screen_height: window.screen.height,
+              screen_color_depth: window.screen.colorDepth,
+              platform: navigator.platform,
+              user_agent: navigator.userAgent,
+              setup_timestamp: new Date().toISOString()
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server returned ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.device_id || !data.api_key) {
+          throw new Error('Invalid response from server - missing device_id or api_key');
+        }
+
+        // Save credentials to localStorage
+        localStorage.setItem('DISPLAYX_SERVER_URL', serverUrl);
+        localStorage.setItem('DISPLAYX_API_KEY', data.api_key);
+        localStorage.setItem('DISPLAYX_DEVICE_ID', data.device_id);
+
+        console.log('Device registered successfully:', data.device_id);
+
+        // Show success message
+        successEl.textContent = '✓ Connected! Redirecting to player...';
+        successEl.style.display = 'block';
+
+        // Redirect to player after 1.5 seconds
+        setTimeout(() => {
+          window.location.href = 'player.html';
+        }, 1500);
+
+      } catch (error) {
+        console.error('Setup error:', error);
+
+        let errorMessage = 'Connection failed. ';
+
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage += 'Could not reach the server. Check the URL and your network connection.';
+        } else if (error.message.includes('401') || error.message.includes('403')) {
+          errorMessage += 'Server refused the connection. Contact your administrator.';
+        } else {
+          errorMessage += error.message;
+        }
+
+        errorEl.textContent = errorMessage;
+        errorEl.style.display = 'block';
+
+        // Re-enable form
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Connect Device';
+      }
+    });
+
+    // Clear error on input change
+    [serverUrlInput, deviceNameInput].forEach(input => {
+      input.addEventListener('input', () => {
+        errorEl.style.display = 'none';
+      });
+    });
+  </script>
+</body>
+</html>

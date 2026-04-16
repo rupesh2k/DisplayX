@@ -12,6 +12,12 @@ export class ConfigFetcher extends EventEmitter {
     this.lastETag = null;
     this.configUrl = null;
     this.pollInterval = null;
+
+    // Server mode configuration
+    this.serverUrl = localStorage.getItem('DISPLAYX_SERVER_URL');
+    this.apiKey = localStorage.getItem('DISPLAYX_API_KEY');
+    this.deviceId = localStorage.getItem('DISPLAYX_DEVICE_ID');
+    this.configHash = localStorage.getItem('DISPLAYX_CONFIG_HASH');
   }
 
   /**
@@ -25,45 +31,20 @@ export class ConfigFetcher extends EventEmitter {
   }
 
   /**
-   * Fetch config.json from URL
+   * Fetch config.json from URL (supports both server and static modes)
    * @returns {Promise<Object>} Config object
    */
   async fetchConfig() {
     this.emit('config:validating', { message: 'Fetching config...' });
 
     try {
-      const response = await fetch(this.configUrl, {
-        cache: 'no-store',
-        headers: this.lastETag ? { 'If-None-Match': this.lastETag } : {}
-      });
-
-      if (response.status === 304) {
-        // Config unchanged
-        console.log('Config unchanged (304 Not Modified)');
-        return this.config;
+      // Server mode (if configured)
+      if (this.serverUrl && this.apiKey && this.deviceId) {
+        return await this.fetchFromServer();
       }
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const config = await response.json();
-
-      // Update ETag for next poll
-      this.lastETag = response.headers.get('ETag');
-
-      // Validate config against schema
-      if (!this.validateConfig(config)) {
-        throw new Error('Config validation failed');
-      }
-
-      this.config = config;
-      this.emit('config:loaded', { config });
-
-      // Start polling for updates (if poll_interval_sec is set)
-      this.startPolling();
-
-      return config;
+      // Static mode (backward compatible)
+      return await this.fetchFromStaticUrl();
 
     } catch (error) {
       console.error('Config fetch error:', error);
@@ -73,6 +54,104 @@ export class ConfigFetcher extends EventEmitter {
       });
       throw error;
     }
+  }
+
+  /**
+   * Fetch config from DisplayX server
+   * @returns {Promise<Object>} Config object
+   */
+  async fetchFromServer() {
+    const url = `${this.serverUrl}/api/v1/devices/${this.deviceId}/config`;
+    const headers = {
+      'Authorization': `Bearer ${this.apiKey}`
+    };
+
+    // Add ETag for 304 Not Modified
+    if (this.configHash) {
+      headers['If-None-Match'] = this.configHash;
+    }
+
+    console.log('Fetching config from server:', url);
+
+    const response = await fetch(url, {
+      headers,
+      cache: 'no-store'
+    });
+
+    // Config hasn't changed
+    if (response.status === 304) {
+      console.log('Config unchanged (304 Not Modified)');
+      return this.config;
+    }
+
+    if (response.status === 401) {
+      throw new Error('Authentication failed. Check your API key.');
+    }
+
+    if (!response.ok) {
+      throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+    }
+
+    const config = await response.json();
+
+    // Save new config hash for ETag
+    const newHash = response.headers.get('ETag');
+    if (newHash) {
+      this.configHash = newHash;
+      localStorage.setItem('DISPLAYX_CONFIG_HASH', newHash);
+    }
+
+    // Validate config against schema
+    if (!this.validateConfig(config)) {
+      throw new Error('Config validation failed');
+    }
+
+    this.config = config;
+    this.emit('config:loaded', { config });
+
+    // Start polling for updates (if poll_interval_sec is set)
+    this.startPolling();
+
+    return config;
+  }
+
+  /**
+   * Fetch config from static URL (backward compatible)
+   * @returns {Promise<Object>} Config object
+   */
+  async fetchFromStaticUrl() {
+    const response = await fetch(this.configUrl, {
+      cache: 'no-store',
+      headers: this.lastETag ? { 'If-None-Match': this.lastETag } : {}
+    });
+
+    if (response.status === 304) {
+      // Config unchanged
+      console.log('Config unchanged (304 Not Modified)');
+      return this.config;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const config = await response.json();
+
+    // Update ETag for next poll
+    this.lastETag = response.headers.get('ETag');
+
+    // Validate config against schema
+    if (!this.validateConfig(config)) {
+      throw new Error('Config validation failed');
+    }
+
+    this.config = config;
+    this.emit('config:loaded', { config });
+
+    // Start polling for updates (if poll_interval_sec is set)
+    this.startPolling();
+
+    return config;
   }
 
   /**

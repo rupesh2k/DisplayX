@@ -1,6 +1,7 @@
 import { ConfigFetcher } from './ConfigFetcher.js';
 import { AssetCache } from './AssetCache.js';
 import { ScheduleEngine } from './ScheduleEngine.js';
+import { Heartbeat } from './Heartbeat.js';
 
 /**
  * Player - Main orchestrator for DisplayX player
@@ -10,6 +11,7 @@ class Player {
     this.configFetcher = new ConfigFetcher();
     this.assetCache = new AssetCache();
     this.scheduleEngine = null;
+    this.heartbeat = null; // Heartbeat instance for server mode
     this.isOffline = false;
     this.currentAsset = null;
     this.hls = null; // HLS.js instance for livestream playback
@@ -41,18 +43,31 @@ class Player {
    */
   async init() {
     try {
-      // Get config URL from query param
+      // Check if server mode is configured
+      const serverUrl = localStorage.getItem('DISPLAYX_SERVER_URL');
+      const apiKey = localStorage.getItem('DISPLAYX_API_KEY');
+      const deviceId = localStorage.getItem('DISPLAYX_DEVICE_ID');
+
+      // Initialize heartbeat if server mode is enabled
+      if (serverUrl && apiKey && deviceId) {
+        console.log('Server mode detected - device ID:', deviceId);
+        this.heartbeat = new Heartbeat(serverUrl, apiKey, deviceId);
+        this.heartbeat.start();
+      }
+
+      // Get config URL from query param (for static mode)
       const urlParams = new URLSearchParams(window.location.search);
       const configUrl = urlParams.get('config');
       const clearCache = urlParams.get('clear-cache') === 'true';
 
-      if (!configUrl) {
+      // In server mode, config URL is optional
+      if (!serverUrl && !configUrl) {
         throw new Error('Missing config URL parameter. Usage: player.html?config=https://...');
       }
 
       // Show loading screen
       this.showScreen('loading');
-      this.loadingMessage.textContent = 'Loading configuration...';
+      this.loadingMessage.textContent = serverUrl ? 'Connecting to server...' : 'Loading configuration...';
 
       // Initialize IndexedDB
       await this.assetCache.init();
@@ -409,6 +424,10 @@ class Player {
    * Cleanup resources
    */
   destroy() {
+    if (this.heartbeat) {
+      this.heartbeat.stop();
+      this.heartbeat = null;
+    }
     if (this.hls) {
       this.hls.destroy();
       this.hls = null;
@@ -424,6 +443,12 @@ class Player {
     }
   }
 }
+
+// Stop heartbeat on page unload
+window.addEventListener('beforeunload', () => {
+  // Find player instance and stop heartbeat
+  // This ensures heartbeat is stopped even if player.destroy() isn't called
+});
 
 // Initialize player when DOM is ready
 if (document.readyState === 'loading') {
