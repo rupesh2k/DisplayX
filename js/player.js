@@ -290,6 +290,14 @@ class Player {
       } catch (error) {
         console.error('Video playback error:', error);
 
+        // Check if it's a CORS error (NotSupportedError usually means no valid source)
+        if (error.name === 'NotSupportedError') {
+          const isCached = await this.assetCache.getAsset(asset.id);
+          if (!isCached) {
+            console.error(`❌ CORS Error: Video "${asset.id}" at ${assetUrl} cannot be loaded due to CORS restrictions. Please use a CORS-enabled video URL or host the video on your own server.`);
+          }
+        }
+
         // If unmuted playback fails, try muted
         if (!this.assetVideo.muted) {
           console.warn('Retrying video playback muted');

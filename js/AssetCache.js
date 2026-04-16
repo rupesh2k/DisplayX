@@ -94,9 +94,18 @@ export class AssetCache extends EventEmitter {
       return;
     }
 
-    // Fetch asset
-    const response = await fetch(asset.url);
+    // Fetch asset with CORS mode
+    const response = await fetch(asset.url, {
+      mode: 'cors',
+      credentials: 'omit'
+    });
+
     if (!response.ok) {
+      // Check if it's a CORS/403 error - these assets can't be cached but might be streamable
+      if (response.status === 403 || response.type === 'opaque') {
+        console.warn(`Asset ${asset.id} can't be cached (CORS/403), will stream directly`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText} (asset will stream without cache)`);
+      }
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
