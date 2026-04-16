@@ -55,6 +55,11 @@ class Player {
         this.heartbeat.start();
       }
 
+      // Listen for config updates
+      this.configFetcher.on('config:loaded', async (data) => {
+        await this.handleConfigUpdate(data.config);
+      });
+
       // Get config URL from query param (for static mode)
       const urlParams = new URLSearchParams(window.location.search);
       const configUrl = urlParams.get('config');
@@ -106,6 +111,49 @@ class Player {
       console.error('Initialization error:', error);
       this.showError(error.message);
     }
+  }
+
+  /**
+   * Handle config update (when server pushes new config during polling)
+   * @param {Object} newConfig - New config object
+   */
+  async handleConfigUpdate(newConfig) {
+    console.log('Config update detected, reloading playback...');
+
+    // Check if config version changed
+    const lastConfigVersion = localStorage.getItem('displayx:config-version');
+    const currentConfigVersion = newConfig.package_version;
+
+    // Only reload if this is a different config (not the initial load)
+    if (!this.scheduleEngine) {
+      console.log('Initial config load, skipping reload');
+      return;
+    }
+
+    // Check if config actually changed
+    if (lastConfigVersion === currentConfigVersion) {
+      console.log('Config version unchanged, skipping reload');
+      return;
+    }
+
+    console.log(`Config changed: ${lastConfigVersion} → ${currentConfigVersion}`);
+
+    // Update stored version
+    localStorage.setItem('displayx:config-version', currentConfigVersion);
+
+    // Stop current schedule engine
+    if (this.scheduleEngine) {
+      this.scheduleEngine.destroy();
+      this.scheduleEngine = null;
+    }
+
+    // Cache new assets (in background, don't block playback)
+    this.cacheAssets(newConfig).catch(err => {
+      console.error('Failed to cache new assets:', err);
+    });
+
+    // Restart playback with new config
+    await this.startPlayback(newConfig);
   }
 
   /**

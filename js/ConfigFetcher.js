@@ -66,21 +66,27 @@ export class ConfigFetcher extends EventEmitter {
       'Authorization': `Bearer ${this.apiKey}`
     };
 
-    // Add ETag for 304 Not Modified
-    if (this.configHash) {
+    // Add ETag for 304 Not Modified (only if we already have a config loaded)
+    if (this.configHash && this.config) {
       headers['If-None-Match'] = this.configHash;
     }
 
     console.log('Fetching config from server:', url);
+    console.log('Request headers:', headers);
 
     const response = await fetch(url, {
       headers,
       cache: 'no-store'
     });
 
-    // Config hasn't changed
+    console.log('Response status:', response.status);
+
+    // Config hasn't changed (only valid if we already have a config)
     if (response.status === 304) {
       console.log('Config unchanged (304 Not Modified)');
+      if (!this.config) {
+        throw new Error('Received 304 but no config in memory - this should not happen');
+      }
       return this.config;
     }
 
@@ -93,6 +99,7 @@ export class ConfigFetcher extends EventEmitter {
     }
 
     const config = await response.json();
+    console.log('Config loaded successfully from server');
 
     // Save new config hash for ETag
     const newHash = response.headers.get('ETag');
