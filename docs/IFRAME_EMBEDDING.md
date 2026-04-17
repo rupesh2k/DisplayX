@@ -4,6 +4,21 @@ The DisplayX config editor can be embedded in dashboards and other applications 
 
 ## Quick Start
 
+### Recommended (with origin validation):
+
+```html
+<iframe
+  id="displayx-editor"
+  src="https://rupesh2k.github.io/DisplayX/editor/?parentOrigin=https://yourdomain.com"
+  width="100%"
+  height="800px"
+  allow="clipboard-write"
+  sandbox="allow-scripts allow-same-origin allow-forms allow-modals">
+</iframe>
+```
+
+### Basic (less secure):
+
 ```html
 <iframe
   id="displayx-editor"
@@ -13,6 +28,8 @@ The DisplayX config editor can be embedded in dashboards and other applications 
   allow="clipboard-write">
 </iframe>
 ```
+
+**Security Note**: Always include `parentOrigin` parameter and validate origins in production!
 
 ## PostMessage API
 
@@ -133,11 +150,38 @@ window.addEventListener('message', (event) => {
 </html>
 ```
 
-## Security
+## Security ⚠️ IMPORTANT
 
-### Origin Validation
+### Current Security Features
 
-In production, **always validate the message origin**:
+The editor includes these protections:
+
+1. **Origin Whitelist**: Only accepts messages from allowed domains
+2. **Config Validation**: Checks structure before loading
+3. **URL Sanitization**: Blocks suspicious URLs (javascript:, file:, etc.)
+4. **Rate Limiting**: Prevents message flooding
+5. **Parent Origin Parameter**: Recommended secure approach
+
+### Security Vulnerabilities to Know
+
+**⚠️ Important Limitations:**
+
+1. **Default whitelist is permissive** - Includes localhost and GitHub Pages
+2. **No authentication** - Anyone who can embed the iframe can modify configs
+3. **Data exposure** - Config data visible to embedding page
+4. **CSRF possible** - No tokens or session validation
+
+### Secure Setup (Recommended)
+
+**Step 1: Use parentOrigin parameter**
+
+```html
+<iframe src="https://rupesh2k.github.io/DisplayX/editor/?parentOrigin=https://yourdomain.com"></iframe>
+```
+
+This tells the editor to only communicate with your specific domain.
+
+**Step 2: Always validate message origin**
 
 ```javascript
 window.addEventListener('message', (event) => {
@@ -151,15 +195,41 @@ window.addEventListener('message', (event) => {
 });
 ```
 
+### iframe Sandbox Attribute
+
+Use the `sandbox` attribute for additional security:
+
+```html
+<iframe
+  src="https://rupesh2k.github.io/DisplayX/editor/?parentOrigin=https://yourdomain.com"
+  sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups">
+</iframe>
+```
+
+This prevents:
+- Top-level navigation
+- Downloads without user interaction
+- Access to parent cookies (unless same-origin)
+
 ### Content Security Policy
 
 If your site has CSP headers, ensure you allow framing from your origin:
 
 ```
-Content-Security-Policy: frame-ancestors 'self' https://yourdomain.com
+Content-Security-Policy: frame-src https://rupesh2k.github.io; frame-ancestors 'self'
 ```
 
-The DisplayX editor is hosted on GitHub Pages and allows all origins (`frame-ancestors *`) for maximum compatibility.
+The DisplayX editor is hosted on GitHub Pages and allows all origins for compatibility.
+
+### Production Recommendations
+
+1. **Fork the repository** and host your own editor instance
+2. **Modify `allowedOrigins`** in `js/editor.js` to only your domains
+3. **Add authentication** - Verify user sessions before loading configs
+4. **Use HTTPS only** - Never embed over HTTP
+5. **Monitor postMessage traffic** - Log suspicious activity
+6. **Implement CSP** - Restrict what the iframe can do
+7. **Rate limit config updates** - Prevent abuse
 
 ## Testing Locally
 

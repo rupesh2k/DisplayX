@@ -18,7 +18,19 @@ class ConfigEditor {
 
     // Track if we're embedded in an iframe
     this.isEmbedded = window.self !== window.top;
-    this.parentOrigin = '*'; // Will be set from first postMessage
+    this.parentOrigin = null; // Will be set explicitly or from URL param
+
+    // Whitelist of allowed parent origins (security)
+    // In production, this should be configurable or restricted
+    this.allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:8080',
+      'http://localhost:8081',
+      'http://127.0.0.1:3000',
+      'https://rupesh2k.github.io'
+      // Add your production domains here
+    ];
 
     // UI elements
     this.assetList = document.getElementById('asset-list');
@@ -42,19 +54,37 @@ class ConfigEditor {
    * Initialize postMessage API for iframe embedding
    */
   initPostMessageAPI() {
+    // Check if parent origin is specified via URL parameter (recommended)
+    const urlParams = new URLSearchParams(window.location.search);
+    const parentOriginParam = urlParams.get('parentOrigin');
+
+    if (parentOriginParam && this.allowedOrigins.includes(parentOriginParam)) {
+      this.parentOrigin = parentOriginParam;
+      console.log('[Editor] Parent origin set from URL param:', this.parentOrigin);
+    }
+
     window.addEventListener('message', (event) => {
       // Security: Only accept messages when embedded
-      if (!this.isEmbedded) return;
+      if (!this.isEmbedded) {
+        console.warn('[Editor] Ignoring message - not embedded');
+        return;
+      }
 
-      // Store the parent origin from first message for security
-      if (this.parentOrigin === '*') {
+      // Validate origin is in whitelist
+      if (!this.allowedOrigins.includes(event.origin)) {
+        console.warn('[Editor] Message from non-whitelisted origin:', event.origin);
+        return;
+      }
+
+      // Set parent origin from first valid message if not already set
+      if (!this.parentOrigin) {
         this.parentOrigin = event.origin;
         console.log('[Editor] Parent origin set to:', this.parentOrigin);
       }
 
-      // Validate origin matches
+      // Validate origin matches established parent
       if (event.origin !== this.parentOrigin) {
-        console.warn('[Editor] Message from untrusted origin:', event.origin);
+        console.warn('[Editor] Message from different origin than parent:', event.origin);
         return;
       }
 
@@ -62,14 +92,24 @@ class ConfigEditor {
 
       if (type === 'LOAD_CONFIG' && config) {
         console.log('[Editor] Received LOAD_CONFIG from parent');
+
+        // Validate config structure before loading
+        if (!this.validateConfigStructure(config)) {
+          console.error('[Editor] Invalid config structure received');
+          this.notifyParentError('Invalid config structure');
+          return;
+        }
+
         this.loadConfigFromObject(config);
       }
     });
 
     // Notify parent that editor is ready
     if (this.isEmbedded) {
-      window.parent.postMessage({ type: 'EDITOR_READY' }, '*');
-      console.log('[Editor] Sent EDITOR_READY to parent');
+      // Only send to parent origin if known, otherwise broadcast once
+      const targetOrigin = this.parentOrigin || '*';
+      window.parent.postMessage({ type: 'EDITOR_READY' }, targetOrigin);
+      console.log('[Editor] Sent EDITOR_READY to:', targetOrigin);
 
       // Show embedded mode badge
       const embeddedBadge = document.getElementById('embedded-badge');
@@ -80,12 +120,61 @@ class ConfigEditor {
   }
 
   /**
+   * Validate incoming config structure
+   */
+  validateConfigStructure(config) {
+    if (!config || typeof config !== 'object') return false;
+    if (!config.version || !config.assets || !Array.isArray(config.assets)) return false;
+    if (!config.schedule || !Array.isArray(config.schedule)) return false;
+
+    // Sanitize URLs to prevent XSS
+    config.assets.forEach(asset => {
+      if (asset.url && typeof asset.url === 'string') {
+        // Only allow https, http, and data URLs
+        const url = asset.url.toLowerCase();
+        if (!url.startsWith('https://') &&
+            !url.startsWith('http://') &&
+            !url.startsWith('data:image/') &&
+            !url.startsWith('data:video/')) {
+          console.warn('[Editor] Suspicious URL blocked:', asset.url);
+          asset.url = '';
+        }
+      }
+    });
+
+    return true;
+  }
+
+  /**
+   * Notify parent of error
+   */
+  notifyParentError(message) {
+    if (!this.isEmbedded || !this.parentOrigin) return;
+
+    window.parent.postMessage({
+      type: 'ERROR',
+      message: message
+    }, this.parentOrigin);
+  }
+
+  /**
    * Send config update to parent window (when embedded)
    */
   notifyParentConfigUpdate() {
-    if (!this.isEmbedded) return;
+    if (!this.isEmbedded || !this.parentOrigin) return;
 
     const config = this.generateConfig();
+
+    // Rate limiting: Don't send more than once per 500ms
+    if (this._lastNotifyTime && Date.now() - this._lastNotifyTime < 500) {
+      clearTimeout(this._notifyTimeout);
+      this._notifyTimeout = setTimeout(() => {
+        this.notifyParentConfigUpdate();
+      }, 500);
+      return;
+    }
+    this._lastNotifyTime = Date.now();
+
     window.parent.postMessage({
       type: 'CONFIG_UPDATED',
       config
