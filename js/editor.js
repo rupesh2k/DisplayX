@@ -1,5 +1,9 @@
 /**
  * Config Editor - Form-based UI for creating config.json
+ *
+ * PostMessage API (for iframe embedding):
+ * - Receives: { type: 'LOAD_CONFIG', config: {...} }
+ * - Sends: { type: 'CONFIG_UPDATED', config: {...} }
  */
 class ConfigEditor {
   constructor() {
@@ -11,6 +15,10 @@ class ConfigEditor {
       health_report_url: '',
       analytics_webhook: ''
     };
+
+    // Track if we're embedded in an iframe
+    this.isEmbedded = window.self !== window.top;
+    this.parentOrigin = '*'; // Will be set from first postMessage
 
     // UI elements
     this.assetList = document.getElementById('asset-list');
@@ -27,6 +35,63 @@ class ConfigEditor {
     this.currentEditIndex = null;
 
     this.initEventListeners();
+    this.initPostMessageAPI();
+  }
+
+  /**
+   * Initialize postMessage API for iframe embedding
+   */
+  initPostMessageAPI() {
+    window.addEventListener('message', (event) => {
+      // Security: Only accept messages when embedded
+      if (!this.isEmbedded) return;
+
+      // Store the parent origin from first message for security
+      if (this.parentOrigin === '*') {
+        this.parentOrigin = event.origin;
+        console.log('[Editor] Parent origin set to:', this.parentOrigin);
+      }
+
+      // Validate origin matches
+      if (event.origin !== this.parentOrigin) {
+        console.warn('[Editor] Message from untrusted origin:', event.origin);
+        return;
+      }
+
+      const { type, config } = event.data;
+
+      if (type === 'LOAD_CONFIG' && config) {
+        console.log('[Editor] Received LOAD_CONFIG from parent');
+        this.loadConfigFromObject(config);
+      }
+    });
+
+    // Notify parent that editor is ready
+    if (this.isEmbedded) {
+      window.parent.postMessage({ type: 'EDITOR_READY' }, '*');
+      console.log('[Editor] Sent EDITOR_READY to parent');
+
+      // Show embedded mode badge
+      const embeddedBadge = document.getElementById('embedded-badge');
+      if (embeddedBadge) {
+        embeddedBadge.style.display = 'flex';
+      }
+    }
+  }
+
+  /**
+   * Send config update to parent window (when embedded)
+   */
+  notifyParentConfigUpdate() {
+    if (!this.isEmbedded) return;
+
+    const config = this.generateConfig();
+    window.parent.postMessage({
+      type: 'CONFIG_UPDATED',
+      config
+    }, this.parentOrigin);
+
+    console.log('[Editor] Sent CONFIG_UPDATED to parent');
   }
 
   initEventListeners() {
@@ -100,15 +165,19 @@ class ConfigEditor {
     // Settings inputs
     document.getElementById('poll-interval').addEventListener('change', (e) => {
       this.settings.poll_interval_sec = parseInt(e.target.value, 10);
+      this.notifyParentConfigUpdate();
     });
     document.getElementById('cache-size').addEventListener('change', (e) => {
       this.settings.cache_size_gb = parseFloat(e.target.value);
+      this.notifyParentConfigUpdate();
     });
     document.getElementById('health-url').addEventListener('change', (e) => {
       this.settings.health_report_url = e.target.value;
+      this.notifyParentConfigUpdate();
     });
     document.getElementById('analytics-url').addEventListener('change', (e) => {
       this.settings.analytics_webhook = e.target.value;
+      this.notifyParentConfigUpdate();
     });
 
     // Validate button
@@ -266,6 +335,7 @@ class ConfigEditor {
 
     this.renderAssets();
     this.closeModals();
+    this.notifyParentConfigUpdate();
   }
 
   fileToDataUrl(file) {
@@ -328,6 +398,7 @@ class ConfigEditor {
 
     this.renderSchedule();
     this.closeModals();
+    this.notifyParentConfigUpdate();
   }
 
   hasOverlap(newBlock) {
@@ -446,6 +517,7 @@ class ConfigEditor {
 
     this.assets.splice(index, 1);
     this.renderAssets();
+    this.notifyParentConfigUpdate();
   }
 
   deleteScheduleBlock(index) {
@@ -454,6 +526,7 @@ class ConfigEditor {
 
     this.scheduleBlocks.splice(index, 1);
     this.renderSchedule();
+    this.notifyParentConfigUpdate();
   }
 
   validateConfig() {
@@ -490,6 +563,10 @@ class ConfigEditor {
     this.validationStatus.className = 'validation-status success';
     this.validationStatus.textContent = '✅ Configuration valid';
     return true;
+  }
+
+  generateConfig() {
+    return this.buildConfig();
   }
 
   buildConfig() {
@@ -603,6 +680,14 @@ class ConfigEditor {
     if (this.storageFill) {
       this.storageFill.style.width = `${percentage}%`;
     }
+  }
+
+  /**
+   * Load config from object (used by postMessage API)
+   */
+  loadConfigFromObject(config) {
+    this.loadConfig(config);
+    console.log('[Editor] Config loaded from postMessage');
   }
 
   loadConfig(config) {

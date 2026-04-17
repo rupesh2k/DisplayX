@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Embed Test - DisplayX</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f7fafc;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #1a202c;
+    }
+
+    .test-controls {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .test-controls h2 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      color: #2d3748;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #5a67d8;
+    }
+
+    button.secondary {
+      background: #718096;
+    }
+
+    button.secondary:hover {
+      background: #4a5568;
+    }
+
+    .status {
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      margin-bottom: 10px;
+    }
+
+    .status-label {
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .log {
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      max-height: 200px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+    }
+
+    .log-timestamp {
+      color: #718096;
+    }
+
+    .log-type {
+      color: #48bb78;
+      font-weight: bold;
+    }
+
+    .iframe-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      height: 800px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    pre {
+      background: #f7fafc;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>DisplayX Editor - Iframe Embed Test</h1>
+
+    <div class="test-controls">
+      <h2>Test Controls</h2>
+
+      <div class="status">
+        <span class="status-label">Editor Status:</span> <span id="editor-status">Not loaded</span>
+      </div>
+
+      <div class="button-group">
+        <button onclick="loadSampleConfig()">Load Sample Config</button>
+        <button onclick="loadMinimalConfig()">Load Minimal Config</button>
+        <button class="secondary" onclick="clearLog()">Clear Log</button>
+      </div>
+
+      <h3 style="margin: 15px 0 10px 0; font-size: 16px;">Message Log:</h3>
+      <div id="log" class="log"></div>
+    </div>
+
+    <div class="iframe-container">
+      <iframe id="editor-iframe" src="./editor/index.html"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const iframe = document.getElementById('editor-iframe');
+    const log = document.getElementById('log');
+    const statusEl = document.getElementById('editor-status');
+    let editorReady = false;
+
+    // Log helper
+    function addLog(type, message, data) {
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> <span class="log-type">${type}:</span> ${message}`;
+      if (data) {
+        entry.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      }
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function clearLog() {
+      log.innerHTML = '';
+    }
+
+    // Listen for messages from iframe
+    window.addEventListener('message', (event) => {
+      // Security: Check origin in production
+      // if (event.origin !== 'https://rupesh2k.github.io') return;
+
+      const { type, config } = event.data;
+
+      if (type === 'EDITOR_READY') {
+        editorReady = true;
+        statusEl.textContent = 'Ready';
+        statusEl.style.color = '#48bb78';
+        addLog('RECEIVED', 'Editor ready signal');
+      } else if (type === 'CONFIG_UPDATED') {
+        addLog('RECEIVED', 'Config updated', config);
+      }
+    });
+
+    // Load sample config
+    function loadSampleConfig() {
+      if (!editorReady) {
+        alert('Editor not ready yet. Please wait...');
+        return;
+      }
+
+      const sampleConfig = {
+        version: "1.0",
+        package_version: new Date().toISOString(),
+        settings: {
+          cache_size_gb: 5,
+          poll_interval_sec: 300,
+          health_report_url: "",
+          analytics_webhook: ""
+        },
+        assets: [
+          {
+            id: "sample-image-1",
+            type: "image",
+            url: "https://picsum.photos/1920/1080?random=1",
+            cached: true
+          },
+          {
+            id: "sample-image-2",
+            type: "image",
+            url: "https://picsum.photos/1920/1080?random=2",
+            cached: true
+          }
+        ],
+        schedule: [
+          {
+            time_range: ["00:00", "23:59"],
+            playlist: ["sample-image-1", "sample-image-2"],
+            durations_sec: [10, 10],
+            transition: { type: "crossfade", duration_ms: 300 }
+          }
+        ],
+        fallback: {
+          asset_id: "sample-image-1",
+          message: "Offline"
+        }
+      };
+
+      iframe.contentWindow.postMessage({
+        type: 'LOAD_CONFIG',
+        config: sampleConfig
+      }, '*');
+
+      addLog('SENT', 'LOAD_CONFIG with sample config', sampleConfig);
+    }
+
+    // Load minimal config
+    function loadMinimalConfig() {
+      if (!editorReady) {
+        alert('Editor not ready yet. Please wait...');
+        return;
+      }
+
+      const minimalConfig = {
+        version: "1.0",
+        package_version: new Date().toISOString(),
+        settings: {
+          cache_size_gb: 3,
+          poll_interval_sec: 600
+        },
+        assets: [
+          {
+            id: "test-asset",
+            type: "image",
+            url: "https://picsum.photos/1920/1080",
+            cached: false
+          }
+        ],
+        schedule: [
+          {
+            time_range: ["00:00", "23:59"],
+            playlist: ["test-asset"],
+            durations_sec: [5],
+            transition: { type: "hard-cut", duration_ms: 0 }
+          }
+        ],
+        fallback: {
+          asset_id: "test-asset",
+          message: "Loading..."
+        }
+      };
+
+      iframe.contentWindow.postMessage({
+        type: 'LOAD_CONFIG',
+        config: minimalConfig
+      }, '*');
+
+      addLog('SENT', 'LOAD_CONFIG with minimal config', minimalConfig);
+    }
+
+    // Initial log entry
+    addLog('INFO', 'Test page loaded. Waiting for editor...');
+  </script>
+</body>
+</html>

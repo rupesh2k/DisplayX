@@ -524,6 +524,26 @@ header nav {
   }
 }
 
+/* Embedded Mode Badge */
+.embedded-badge {
+  display: none;
+  align-items: center;
+  gap: var(--spacing-8);
+  padding: 6px 12px;
+  background: #667eea;
+  color: white;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.embedded-badge svg {
+  opacity: 0.9;
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {
