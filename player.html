@@ -39,6 +39,19 @@
       <span>Offline</span>
     </div>
 
+    <!-- Asset Error Overlay -->
+    <div id="asset-error-overlay" class="asset-error-overlay" style="display: none;">
+      <div class="asset-error-content">
+        <svg class="error-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="#ea580c" stroke-width="2"/>
+          <path d="M32 20 L32 36 M32 44 L32 46" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <h2 id="asset-error-title">Asset Load Failed</h2>
+        <p id="asset-error-message"></p>
+        <p class="asset-error-detail">Will retry with next asset...</p>
+      </div>
+    </div>
+
     <!-- Asset Display -->
     <img id="asset-image" class="asset" alt="Signage content" crossorigin="anonymous" style="display: none;">
     <video id="asset-video" class="asset" aria-label="Signage content" crossorigin="anonymous" style="display: none;"></video>

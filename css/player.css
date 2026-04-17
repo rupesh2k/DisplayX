@@ -221,6 +221,63 @@ body {
   height: 16px;
 }
 
+/* Asset Error Overlay */
+.asset-error-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn var(--transition-duration) var(--transition-easing);
+}
+
+.asset-error-content {
+  text-align: center;
+  max-width: 600px;
+  padding: var(--spacing-32);
+}
+
+.asset-error-overlay .error-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-24) auto;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.asset-error-overlay h2 {
+  font-size: var(--font-size-24);
+  font-weight: 700;
+  color: #ea580c;
+  margin: 0 0 var(--spacing-16) 0;
+}
+
+.asset-error-overlay p {
+  font-size: var(--font-size-16);
+  color: var(--color-white);
+  margin: 0 0 var(--spacing-12) 0;
+  line-height: 1.6;
+}
+
+.asset-error-detail {
+  font-size: var(--font-size-14);
+  color: rgba(255, 255, 255, 0.6);
+}
+
 /* Transitions (GPU-accelerated) */
 @keyframes crossfade {
   from {

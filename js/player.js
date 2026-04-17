@@ -28,6 +28,9 @@ class Player {
     this.offlineBadge = document.getElementById('offline-badge');
     this.assetImage = document.getElementById('asset-image');
     this.assetVideo = document.getElementById('asset-video');
+    this.assetErrorOverlay = document.getElementById('asset-error-overlay');
+    this.assetErrorTitle = document.getElementById('asset-error-title');
+    this.assetErrorMessage = document.getElementById('asset-error-message');
 
     // Bind event handlers
     this.retryBtn.addEventListener('click', () => this.handleRetry());
@@ -246,21 +249,30 @@ class Player {
     if (asset.type === 'image') {
       // Preload image
       const img = new Image();
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = assetUrl;
-      });
+      try {
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = assetUrl;
+        });
 
-      // Hide video, show image
-      this.assetVideo.style.display = 'none';
-      this.assetImage.style.display = 'block';
-      this.assetImage.src = assetUrl;
-      this.assetImage.alt = `${asset.id} image`;
+        // Hide video, show image
+        this.assetVideo.style.display = 'none';
+        this.assetImage.style.display = 'block';
+        this.assetImage.src = assetUrl;
+        this.assetImage.alt = `${asset.id} image`;
 
-      // Apply transition
-      if (shouldAnimate) {
-        this.assetImage.style.animation = `${transitionType} ${transitionDuration}ms ease-in-out`;
+        // Apply transition
+        if (shouldAnimate) {
+          this.assetImage.style.animation = `${transitionType} ${transitionDuration}ms ease-in-out`;
+        }
+      } catch (error) {
+        console.error('Image load error:', error);
+        const isCached = await this.assetCache.getAsset(asset.id);
+        if (!isCached) {
+          const errorMsg = `This image could not be loaded. It may be blocked by CORS policy or the URL may be invalid.`;
+          this.showAssetError(asset.id, errorMsg);
+        }
       }
 
     } else if (asset.type === 'video') {
@@ -294,7 +306,9 @@ class Player {
         if (error.name === 'NotSupportedError') {
           const isCached = await this.assetCache.getAsset(asset.id);
           if (!isCached) {
-            console.error(`❌ CORS Error: Video "${asset.id}" at ${assetUrl} cannot be loaded due to CORS restrictions. Please use a CORS-enabled video URL or host the video on your own server.`);
+            const errorMsg = `This video is blocked by CORS policy. The video URL does not allow cross-origin access. Please use a CORS-enabled video URL or host the video on your own server.`;
+            console.error(`❌ CORS Error: Video "${asset.id}" at ${assetUrl} cannot be loaded due to CORS restrictions.`);
+            this.showAssetError(asset.id, errorMsg);
           }
         }
 
@@ -311,18 +325,19 @@ class Player {
       }
 
     } else if (asset.type === 'live_stream') {
-      // Hide image, show video (livestream uses video element)
-      this.assetImage.style.display = 'none';
-      this.assetVideo.style.display = 'block';
+      try {
+        // Hide image, show video (livestream uses video element)
+        this.assetImage.style.display = 'none';
+        this.assetVideo.style.display = 'block';
 
-      // Cleanup previous HLS instance if exists
-      if (this.hls) {
-        this.hls.destroy();
-        this.hls = null;
-      }
+        // Cleanup previous HLS instance if exists
+        if (this.hls) {
+          this.hls.destroy();
+          this.hls = null;
+        }
 
-      // Check if HLS.js is supported
-      if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+        // Check if HLS.js is supported
+        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
         // Use HLS.js for browsers that don't have native HLS support
         this.hls = new Hls({
           enableWorker: true,
@@ -394,6 +409,11 @@ class Player {
           }
         }
       }
+      } catch (error) {
+        console.error('Livestream setup error:', error);
+        const errorMsg = `Failed to load livestream. ${error.message}`;
+        this.showAssetError(asset.id, errorMsg);
+      }
     }
 
     this.currentAsset = asset;
@@ -415,6 +435,22 @@ class Player {
     } else if (screen === 'player') {
       this.playerScreen.classList.add('active');
     }
+  }
+
+  /**
+   * Show asset error overlay
+   * @param {string} assetId - Asset ID
+   * @param {string} errorMessage - Error message to display
+   */
+  showAssetError(assetId, errorMessage) {
+    this.assetErrorTitle.textContent = `Failed to Load: ${assetId}`;
+    this.assetErrorMessage.textContent = errorMessage;
+    this.assetErrorOverlay.style.display = 'flex';
+
+    // Hide error after 5 seconds
+    setTimeout(() => {
+      this.assetErrorOverlay.style.display = 'none';
+    }, 5000);
   }
 
   /**
