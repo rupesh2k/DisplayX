@@ -1,23 +1,25 @@
 # DisplayX Editor - Iframe Embedding
 
-The DisplayX config editor can be embedded in dashboards and other applications using an iframe with postMessage communication.
+The DisplayX config editor is a **free, open source, client-side tool** that can be embedded in any website via iframe. It has **no origin restrictions** and works like any other embeddable tool (text editors, calculators, color pickers).
+
+## ⚠️ Security Philosophy
+
+**This editor is a DUMB TOOL:**
+- ✅ Anyone can embed it
+- ✅ Anyone can send it configs
+- ✅ No authentication
+- ✅ No data storage
+- ✅ Just generates JSON
+
+**Your SERVER is the SMART GUARDIAN:**
+- 🔒 Authenticates users
+- 🔒 Validates all configs
+- 🔒 Enforces permissions
+- 🔒 Stores data securely
+
+**The editor is NOT a security boundary.** Your server must validate everything.
 
 ## Quick Start
-
-### Recommended (with origin validation):
-
-```html
-<iframe
-  id="displayx-editor"
-  src="https://rupesh2k.github.io/DisplayX/editor/?parentOrigin=https://yourdomain.com"
-  width="100%"
-  height="800px"
-  allow="clipboard-write"
-  sandbox="allow-scripts allow-same-origin allow-forms allow-modals">
-</iframe>
-```
-
-### Basic (less secure):
 
 ```html
 <iframe
@@ -29,7 +31,7 @@ The DisplayX config editor can be embedded in dashboards and other applications 
 </iframe>
 ```
 
-**Security Note**: Always include `parentOrigin` parameter and validate origins in production!
+That's it! No API keys, no origin restrictions, no configuration needed.
 
 ## PostMessage API
 
@@ -150,52 +152,62 @@ window.addEventListener('message', (event) => {
 </html>
 ```
 
-## Security ⚠️ IMPORTANT
+## Security Model 🔓
 
-### Current Security Features
+### The Editor Has NO Security
 
-The editor includes these protections:
+The editor is intentionally designed as an **open, permissionless tool**:
 
-1. **Origin Whitelist**: Only accepts messages from allowed domains
-2. **Config Validation**: Checks structure before loading
-3. **URL Sanitization**: Blocks suspicious URLs (javascript:, file:, etc.)
-4. **Rate Limiting**: Prevents message flooding
-5. **Parent Origin Parameter**: Recommended secure approach
+- ✅ **No origin restrictions** - Any website can embed it
+- ✅ **No authentication** - No login, no API keys
+- ✅ **No authorization** - Anyone can manipulate configs
+- ✅ **No secrets** - All code is public, inspectable, forkable
 
-### Security Vulnerabilities to Know
+### Basic Protections (Anti-Footgun)
 
-**⚠️ Important Limitations:**
+The editor includes only these minimal protections:
 
-1. **Default whitelist is permissive** - Includes localhost and GitHub Pages
-2. **No authentication** - Anyone who can embed the iframe can modify configs
-3. **Data exposure** - Config data visible to embedding page
-4. **CSRF possible** - No tokens or session validation
+1. **URL Sanitization** - Blocks `javascript:`, `file:`, etc. to prevent XSS
+2. **Config Validation** - Checks structure to prevent crashes
+3. **Rate Limiting** - Debounces messages to prevent DoS
 
-### Secure Setup (Recommended)
+These are **quality-of-life features**, not security boundaries.
 
-**Step 1: Use parentOrigin parameter**
+### Where Security Actually Lives: YOUR SERVER
 
-```html
-<iframe src="https://rupesh2k.github.io/DisplayX/editor/?parentOrigin=https://yourdomain.com"></iframe>
-```
-
-This tells the editor to only communicate with your specific domain.
-
-**Step 2: Always validate message origin**
+**Your backend MUST do this:**
 
 ```javascript
-window.addEventListener('message', (event) => {
-  // Only accept messages from DisplayX editor
-  if (event.origin !== 'https://rupesh2k.github.io') {
-    console.warn('Message from untrusted origin:', event.origin);
-    return;
+app.put('/devices/:id/config', authenticateJWT, async (req, res) => {
+  // 1. Authenticate: Is this a logged-in user?
+  if (!req.user) {
+    return res.status(401).json({ error: 'Not authenticated' });
   }
 
-  // Process message...
+  // 2. Authorize: Can this user edit this device?
+  const device = await Device.findById(req.params.id);
+  if (device.owner_id !== req.user.id) {
+    return res.status(403).json({ error: 'Not your device' });
+  }
+
+  // 3. Validate: Is this config valid?
+  const config = req.body.config_json;
+  if (!validateConfigSchema(config)) {
+    return res.status(400).json({ error: 'Invalid config structure' });
+  }
+
+  // 4. Sanitize: Strip dangerous content
+  const sanitized = sanitizeConfig(config);
+
+  // 5. Save
+  await saveConfig(req.params.id, sanitized);
+  res.json({ success: true });
 });
 ```
 
-### iframe Sandbox Attribute
+**The editor is just a fancy JSON builder.** Treat configs from it like any user input: never trust, always validate.
+
+### Optional: iframe Sandbox Attribute
 
 Use the `sandbox` attribute for additional security:
 

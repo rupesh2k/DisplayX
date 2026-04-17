@@ -18,19 +18,6 @@ class ConfigEditor {
 
     // Track if we're embedded in an iframe
     this.isEmbedded = window.self !== window.top;
-    this.parentOrigin = null; // Will be set explicitly or from URL param
-
-    // Whitelist of allowed parent origins (security)
-    // In production, this should be configurable or restricted
-    this.allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:8080',
-      'http://localhost:8081',
-      'http://127.0.0.1:3000',
-      'https://rupesh2k.github.io'
-      // Add your production domains here
-    ];
 
     // UI elements
     this.assetList = document.getElementById('asset-list');
@@ -52,51 +39,25 @@ class ConfigEditor {
 
   /**
    * Initialize postMessage API for iframe embedding
+   *
+   * SECURITY NOTE: This editor is a client-side tool with no authentication.
+   * It accepts messages from ANY origin. Your server MUST validate all configs,
+   * authenticate users, and enforce permissions. The editor is NOT a security boundary.
    */
   initPostMessageAPI() {
-    // Check if parent origin is specified via URL parameter (recommended)
-    const urlParams = new URLSearchParams(window.location.search);
-    const parentOriginParam = urlParams.get('parentOrigin');
-
-    if (parentOriginParam && this.allowedOrigins.includes(parentOriginParam)) {
-      this.parentOrigin = parentOriginParam;
-      console.log('[Editor] Parent origin set from URL param:', this.parentOrigin);
-    }
-
     window.addEventListener('message', (event) => {
-      // Security: Only accept messages when embedded
-      if (!this.isEmbedded) {
-        console.warn('[Editor] Ignoring message - not embedded');
-        return;
-      }
-
-      // Validate origin is in whitelist
-      if (!this.allowedOrigins.includes(event.origin)) {
-        console.warn('[Editor] Message from non-whitelisted origin:', event.origin);
-        return;
-      }
-
-      // Set parent origin from first valid message if not already set
-      if (!this.parentOrigin) {
-        this.parentOrigin = event.origin;
-        console.log('[Editor] Parent origin set to:', this.parentOrigin);
-      }
-
-      // Validate origin matches established parent
-      if (event.origin !== this.parentOrigin) {
-        console.warn('[Editor] Message from different origin than parent:', event.origin);
-        return;
-      }
+      // Only process messages when embedded
+      if (!this.isEmbedded) return;
 
       const { type, config } = event.data;
 
       if (type === 'LOAD_CONFIG' && config) {
-        console.log('[Editor] Received LOAD_CONFIG from parent');
+        console.log('[Editor] Received LOAD_CONFIG from', event.origin);
 
         // Validate config structure before loading
         if (!this.validateConfigStructure(config)) {
           console.error('[Editor] Invalid config structure received');
-          this.notifyParentError('Invalid config structure');
+          this.notifyParentError('Invalid config structure', event.origin);
           return;
         }
 
@@ -106,10 +67,8 @@ class ConfigEditor {
 
     // Notify parent that editor is ready
     if (this.isEmbedded) {
-      // Only send to parent origin if known, otherwise broadcast once
-      const targetOrigin = this.parentOrigin || '*';
-      window.parent.postMessage({ type: 'EDITOR_READY' }, targetOrigin);
-      console.log('[Editor] Sent EDITOR_READY to:', targetOrigin);
+      window.parent.postMessage({ type: 'EDITOR_READY' }, '*');
+      console.log('[Editor] Sent EDITOR_READY to parent');
 
       // Show embedded mode badge
       const embeddedBadge = document.getElementById('embedded-badge');
@@ -148,20 +107,20 @@ class ConfigEditor {
   /**
    * Notify parent of error
    */
-  notifyParentError(message) {
-    if (!this.isEmbedded || !this.parentOrigin) return;
+  notifyParentError(message, origin = '*') {
+    if (!this.isEmbedded) return;
 
     window.parent.postMessage({
       type: 'ERROR',
       message: message
-    }, this.parentOrigin);
+    }, origin);
   }
 
   /**
    * Send config update to parent window (when embedded)
    */
   notifyParentConfigUpdate() {
-    if (!this.isEmbedded || !this.parentOrigin) return;
+    if (!this.isEmbedded) return;
 
     const config = this.generateConfig();
 
@@ -178,7 +137,7 @@ class ConfigEditor {
     window.parent.postMessage({
       type: 'CONFIG_UPDATED',
       config
-    }, this.parentOrigin);
+    }, '*');
 
     console.log('[Editor] Sent CONFIG_UPDATED to parent');
   }
