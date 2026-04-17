@@ -2,11 +2,17 @@
 
 Reference implementation of the DisplayX digital signage standard.
 
-# Editor - https://rupesh2k.github.io/DisplayX/editor/
+**🎨 [Config Editor](https://rupesh2k.github.io/DisplayX/editor/)** • **🎬 [Live Demo](https://rupesh2k.github.io/DisplayX/player.html?config=https://raw.githubusercontent.com/rupesh2k/DigitalSignageContent/main/config-2026-03-27%20(1).json)** • **📦 [Embed Guide](docs/IFRAME_EMBEDDING_SIMPLE.md)**
 
-# Demo - https://rupesh2k.github.io/DisplayX/player.html?config=https://raw.githubusercontent.com/rupesh2k/DigitalSignageContent/main/config-2026-03-27%20(1).json
+## Embed the Editor in Your Dashboard
 
-# Shorthen URL for Demo - https://tinyurl.com/352n94m5
+The config editor is **free, open, and embeddable**:
+
+```html
+<iframe src="https://rupesh2k.github.io/DisplayX/editor/" width="100%" height="800px"></iframe>
+```
+
+**No API keys, no restrictions, no configuration.** Just embed it. See [Embedding Guide](docs/IFRAME_EMBEDDING_SIMPLE.md) for postMessage API.
 
 ## Quick Start
 
