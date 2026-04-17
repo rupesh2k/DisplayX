@@ -252,6 +252,34 @@ class ConfigEditor {
         this.closeModals();
       }
     });
+
+    // Event delegation for dynamically created buttons
+    // This fixes buttons not working when embedded in iframes
+    document.addEventListener('click', (e) => {
+      // Asset edit button
+      if (e.target.matches('[data-action="edit-asset"]')) {
+        const index = parseInt(e.target.dataset.index, 10);
+        this.showAddAssetModal(index);
+      }
+
+      // Asset delete button
+      if (e.target.matches('[data-action="delete-asset"]')) {
+        const index = parseInt(e.target.dataset.index, 10);
+        this.deleteAsset(index);
+      }
+
+      // Schedule edit button
+      if (e.target.matches('[data-action="edit-schedule"]')) {
+        const index = parseInt(e.target.dataset.index, 10);
+        this.showAddScheduleModal(index);
+      }
+
+      // Schedule delete button
+      if (e.target.matches('[data-action="delete-schedule"]')) {
+        const index = parseInt(e.target.dataset.index, 10);
+        this.deleteScheduleBlock(index);
+      }
+    });
   }
 
   showAddAssetModal(index = null) {
@@ -506,10 +534,10 @@ class ConfigEditor {
             <div class="asset-type">${asset.type}</div>
           </div>
           <div class="asset-actions">
-            <button class="btn btn-secondary btn-small" aria-label="Edit ${asset.id}" onclick="editor.showAddAssetModal(${index})">
+            <button class="btn btn-secondary btn-small" aria-label="Edit ${asset.id}" data-action="edit-asset" data-index="${index}">
               Edit
             </button>
-            <button class="btn btn-secondary btn-small" aria-label="Delete ${asset.id}" onclick="editor.deleteAsset(${index})">
+            <button class="btn btn-secondary btn-small" aria-label="Delete ${asset.id}" data-action="delete-asset" data-index="${index}">
               Delete
             </button>
           </div>
@@ -541,10 +569,10 @@ class ConfigEditor {
         <div class="schedule-header">
           <div class="schedule-time">${block.time_range[0]} - ${block.time_range[1]}</div>
           <div class="asset-actions">
-            <button class="btn btn-secondary btn-small" onclick="editor.showAddScheduleModal(${index})">
+            <button class="btn btn-secondary btn-small" data-action="edit-schedule" data-index="${index}">
               Edit
             </button>
-            <button class="btn btn-secondary btn-small" onclick="editor.deleteScheduleBlock(${index})">
+            <button class="btn btn-secondary btn-small" data-action="delete-schedule" data-index="${index}">
               Delete
             </button>
           </div>
