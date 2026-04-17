@@ -31,7 +31,13 @@ class ConfigEditor {
     // Modals
     this.addAssetModal = document.getElementById('add-asset-modal');
     this.addScheduleModal = document.getElementById('add-schedule-modal');
+    this.deleteModal = document.getElementById('delete-modal');
+    this.confirmModal = document.getElementById('confirm-modal');
+    this.importModal = document.getElementById('import-modal');
+    this.exportModal = document.getElementById('export-modal');
     this.currentEditIndex = null;
+    this.pendingDeleteAction = null; // Store delete action until confirmed
+    this.pendingConfirmAction = null; // Store confirm action until user proceeds
 
     this.initEventListeners();
     this.initPostMessageAPI();
@@ -235,15 +241,58 @@ class ConfigEditor {
 
     // Export buttons
     document.getElementById('export-btn').addEventListener('click', () => {
-      this.exportConfig();
+      this.showExportModal();
     });
     document.getElementById('export-final-btn').addEventListener('click', () => {
-      this.exportConfig();
+      this.showExportModal();
     });
 
     // Import button
     document.getElementById('import-btn').addEventListener('click', () => {
-      this.showImportDialog();
+      this.showImportModal();
+    });
+
+    // Delete modal confirmation
+    document.getElementById('delete-confirm-btn').addEventListener('click', () => {
+      if (this.pendingDeleteAction) {
+        this.pendingDeleteAction();
+        this.pendingDeleteAction = null;
+      }
+      this.closeModals();
+    });
+
+    // General confirm modal
+    document.getElementById('confirm-proceed-btn').addEventListener('click', () => {
+      if (this.pendingConfirmAction) {
+        this.pendingConfirmAction();
+        this.pendingConfirmAction = null;
+      }
+      this.closeModals();
+    });
+
+    // Import modal buttons
+    document.getElementById('import-file-btn').addEventListener('click', () => {
+      this.importFromFile();
+    });
+    document.getElementById('import-url-btn').addEventListener('click', () => {
+      document.querySelector('.import-options').style.display = 'none';
+      document.getElementById('import-url-section').style.display = 'block';
+    });
+    document.getElementById('import-url-back').addEventListener('click', () => {
+      document.querySelector('.import-options').style.display = 'grid';
+      document.getElementById('import-url-section').style.display = 'none';
+      document.getElementById('import-url-input').value = '';
+    });
+    document.getElementById('import-url-fetch').addEventListener('click', () => {
+      const url = document.getElementById('import-url-input').value;
+      if (url) {
+        this.importFromURL(url);
+      }
+    });
+
+    // Export modal buttons
+    document.getElementById('export-download-btn').addEventListener('click', () => {
+      this.performExport();
     });
 
     // Close modals on escape
@@ -357,7 +406,13 @@ class ConfigEditor {
   closeModals() {
     this.addAssetModal.classList.remove('active');
     this.addScheduleModal.classList.remove('active');
+    this.deleteModal.classList.remove('active');
+    this.confirmModal.classList.remove('active');
+    this.importModal.classList.remove('active');
+    this.exportModal.classList.remove('active');
     this.currentEditIndex = null;
+    this.pendingDeleteAction = null;
+    this.pendingConfirmAction = null;
   }
 
   async saveAsset() {
@@ -461,11 +516,20 @@ class ConfigEditor {
       }
     };
 
+    // Check for overlaps
     if (this.currentEditIndex === null && this.hasOverlap(newBlock)) {
-      const proceed = confirm('This schedule block overlaps with an existing block. The last-defined block will take precedence. Continue?');
-      if (!proceed) return;
+      this.showConfirm(
+        'This schedule block overlaps with an existing block. The last-defined block will take precedence. Continue?',
+        () => {
+          this.scheduleBlocks.push(newBlock);
+          this.renderSchedule();
+          this.notifyParentConfigUpdate();
+        }
+      );
+      return;
     }
 
+    // No overlap or editing existing
     if (this.currentEditIndex !== null) {
       this.scheduleBlocks[this.currentEditIndex] = newBlock;
     } else {
@@ -588,21 +652,38 @@ class ConfigEditor {
 
   deleteAsset(index) {
     const asset = this.assets[index];
-    const confirmed = confirm(`Delete asset "${asset.id}"? This cannot be undone.`);
-    if (!confirmed) return;
-
-    this.assets.splice(index, 1);
-    this.renderAssets();
-    this.notifyParentConfigUpdate();
+    this.showDeleteConfirm(
+      `Delete asset "${asset.id}"?`,
+      () => {
+        this.assets.splice(index, 1);
+        this.renderAssets();
+        this.notifyParentConfigUpdate();
+      }
+    );
   }
 
   deleteScheduleBlock(index) {
-    const confirmed = confirm('Delete this schedule block? This cannot be undone.');
-    if (!confirmed) return;
+    const block = this.scheduleBlocks[index];
+    this.showDeleteConfirm(
+      `Delete schedule block ${block.time_range[0]} - ${block.time_range[1]}?`,
+      () => {
+        this.scheduleBlocks.splice(index, 1);
+        this.renderSchedule();
+        this.notifyParentConfigUpdate();
+      }
+    );
+  }
 
-    this.scheduleBlocks.splice(index, 1);
-    this.renderSchedule();
-    this.notifyParentConfigUpdate();
+  showDeleteConfirm(message, onConfirm) {
+    document.getElementById('delete-message').textContent = message;
+    this.pendingDeleteAction = onConfirm;
+    this.deleteModal.classList.add('active');
+  }
+
+  showConfirm(message, onConfirm) {
+    document.getElementById('confirm-message').textContent = message;
+    this.pendingConfirmAction = onConfirm;
+    this.confirmModal.classList.add('active');
   }
 
   validateConfig() {
@@ -659,10 +740,28 @@ class ConfigEditor {
     };
   }
 
-  exportConfig() {
+  showExportModal() {
+    // Validate config
+    const validationDisplay = document.getElementById('export-validation');
     if (!this.validateConfig()) {
-      alert('Please fix validation errors before exporting.');
-      return;
+      validationDisplay.className = 'validation-display error';
+      validationDisplay.textContent = '❌ Please fix validation errors before exporting';
+      // Still show modal so user can see what's wrong
+    } else {
+      validationDisplay.className = 'validation-display success';
+      validationDisplay.textContent = '✅ Configuration is valid';
+    }
+
+    // Update stats
+    document.getElementById('export-asset-count').textContent = this.assets.length;
+    document.getElementById('export-schedule-count').textContent = this.scheduleBlocks.length;
+
+    this.exportModal.classList.add('active');
+  }
+
+  performExport() {
+    if (!this.validateConfig()) {
+      return; // Don't allow export if invalid
     }
 
     const config = this.buildConfig();
@@ -678,23 +777,16 @@ class ConfigEditor {
 
     URL.revokeObjectURL(url);
 
-    alert('Config exported successfully! Upload it to your signage player.');
+    this.closeModals();
   }
 
-  showImportDialog() {
-    const source = prompt(
-      'Import config from:\n\n1. Enter "file" to upload a JSON file\n2. Enter a URL to fetch config from GitHub/CDN\n\nExample URL:\nhttps://raw.githubusercontent.com/user/repo/main/config.json'
-    );
+  showImportModal() {
+    // Reset to initial state
+    document.querySelector('.import-options').style.display = 'grid';
+    document.getElementById('import-url-section').style.display = 'none';
+    document.getElementById('import-url-input').value = '';
 
-    if (!source) return;
-
-    if (source.toLowerCase() === 'file') {
-      this.importFromFile();
-    } else if (source.startsWith('http://') || source.startsWith('https://')) {
-      this.importFromURL(source);
-    } else {
-      alert('Invalid input. Please enter "file" or a valid URL starting with http:// or https://');
-    }
+    this.importModal.classList.add('active');
   }
 
   importFromFile() {
@@ -710,9 +802,14 @@ class ConfigEditor {
         const text = await file.text();
         const config = JSON.parse(text);
         this.loadConfig(config);
-        alert('Config imported successfully!');
+        this.closeModals();
+
+        // Show success message
+        this.validationStatus.className = 'validation-status success';
+        this.validationStatus.textContent = `✅ Config imported successfully: ${this.assets.length} assets, ${this.scheduleBlocks.length} schedules`;
       } catch (error) {
-        alert(`Failed to import config: ${error.message}`);
+        this.validationStatus.className = 'validation-status error';
+        this.validationStatus.textContent = `❌ Failed to import: ${error.message}`;
       }
     };
 
@@ -728,9 +825,14 @@ class ConfigEditor {
 
       const config = await response.json();
       this.loadConfig(config);
-      alert('Config imported successfully from URL!');
+      this.closeModals();
+
+      // Show success message
+      this.validationStatus.className = 'validation-status success';
+      this.validationStatus.textContent = `✅ Config imported from URL: ${this.assets.length} assets, ${this.scheduleBlocks.length} schedules`;
     } catch (error) {
-      alert(`Failed to fetch config from URL: ${error.message}`);
+      this.validationStatus.className = 'validation-status error';
+      this.validationStatus.textContent = `❌ Failed to fetch from URL: ${error.message}`;
     }
   }
 

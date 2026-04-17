@@ -218,6 +218,107 @@
     </div>
   </div>
 
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+    <div class="modal-content modal-sm">
+      <header class="modal-header">
+        <h2 id="delete-title">Confirm Delete</h2>
+        <button class="modal-close" aria-label="Close dialog">&times;</button>
+      </header>
+      <div class="modal-body">
+        <p id="delete-message"></p>
+        <p class="warning-text">⚠️ This action cannot be undone.</p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary modal-cancel">Cancel</button>
+        <button id="delete-confirm-btn" class="btn btn-danger">Delete</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- General Confirm Modal (for warnings) -->
+  <div id="confirm-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-content modal-sm">
+      <header class="modal-header">
+        <h2 id="confirm-title">Confirm Action</h2>
+        <button class="modal-close" aria-label="Close dialog">&times;</button>
+      </header>
+      <div class="modal-body">
+        <p id="confirm-message"></p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary modal-cancel">Cancel</button>
+        <button id="confirm-proceed-btn" class="btn btn-primary">Continue</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div id="import-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="import-title">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="import-title">Import Configuration</h2>
+        <button class="modal-close" aria-label="Close dialog">&times;</button>
+      </header>
+      <div class="modal-body">
+        <div class="import-options">
+          <button id="import-file-btn" class="import-option">
+            <div class="import-icon">📁</div>
+            <div class="import-label">Upload JSON File</div>
+            <div class="import-desc">Import config from your computer</div>
+          </button>
+          <button id="import-url-btn" class="import-option">
+            <div class="import-icon">🌐</div>
+            <div class="import-label">Fetch from URL</div>
+            <div class="import-desc">Import from GitHub, CDN, or server</div>
+          </button>
+        </div>
+
+        <!-- URL Input (hidden by default) -->
+        <div id="import-url-section" style="display: none;">
+          <div class="form-group">
+            <label for="import-url-input">Enter URL:</label>
+            <input type="url" id="import-url-input" placeholder="https://raw.githubusercontent.com/user/repo/main/config.json">
+            <p class="help-text">Must be a publicly accessible JSON config file</p>
+          </div>
+          <div class="button-group">
+            <button id="import-url-back" class="btn btn-secondary">← Back</button>
+            <button id="import-url-fetch" class="btn btn-primary">Fetch Config</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="export-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="export-title">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="export-title">Export Configuration</h2>
+        <button class="modal-close" aria-label="Close dialog">&times;</button>
+      </header>
+      <div class="modal-body">
+        <p>Your configuration is ready to export!</p>
+        <div id="export-validation" class="validation-display"></div>
+        <div class="export-info">
+          <div class="export-stat">
+            <strong id="export-asset-count">0</strong>
+            <span>Assets</span>
+          </div>
+          <div class="export-stat">
+            <strong id="export-schedule-count">0</strong>
+            <span>Schedule Blocks</span>
+          </div>
+        </div>
+        <p class="help-text">The config file will be downloaded as <code>config-YYYY-MM-DD.json</code></p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary modal-cancel">Cancel</button>
+        <button id="export-download-btn" class="btn btn-primary">Download JSON</button>
+      </footer>
+    </div>
+  </div>
+
   <script type="module" src="../js/editor.js"></script>
 </body>
 </html>
