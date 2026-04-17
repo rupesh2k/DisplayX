@@ -279,6 +279,12 @@ class Player {
       // Hide image, show video
       this.assetImage.style.display = 'none';
       this.assetVideo.style.display = 'block';
+
+      // Reset video element for new source
+      this.assetVideo.pause();
+      this.assetVideo.removeAttribute('src');
+      this.assetVideo.load();
+
       this.assetVideo.src = assetUrl;
       this.assetVideo.loop = false;
 
@@ -290,36 +296,60 @@ class Player {
         this.assetVideo.style.animation = `${transitionType} ${transitionDuration}ms ease-in-out`;
       }
 
-      // Start playback
+      // Wait for video to be ready
       try {
+        await new Promise((resolve, reject) => {
+          const onCanPlay = () => {
+            console.log(`Video ready: ${asset.id}, duration: ${this.assetVideo.duration}s`);
+            resolve();
+          };
+
+          const onError = (e) => {
+            reject(new Error(e.target.error?.message || 'Video load failed'));
+          };
+
+          // Check if already ready
+          if (this.assetVideo.readyState >= 3) {
+            resolve();
+          } else {
+            this.assetVideo.addEventListener('canplay', onCanPlay, { once: true });
+            this.assetVideo.addEventListener('error', onError, { once: true });
+          }
+        });
+
+        // Start playback
         await this.assetVideo.play();
+        console.log(`Video playing: ${asset.id}`);
 
         // Unmute after successful playback start
         // Small delay ensures playback is stable
         setTimeout(() => {
           this.assetVideo.muted = false;
         }, 100);
+
       } catch (error) {
         console.error('Video playback error:', error);
 
-        // Check if it's a CORS error (NotSupportedError usually means no valid source)
-        if (error.name === 'NotSupportedError') {
+        // Check if it's a CORS or format error
+        if (error.name === 'NotSupportedError' || error.message?.includes('format')) {
           const isCached = await this.assetCache.getAsset(asset.id);
           if (!isCached) {
-            const errorMsg = `This video is blocked by CORS policy. The video URL does not allow cross-origin access. Please use a CORS-enabled video URL or host the video on your own server.`;
-            console.error(`❌ CORS Error: Video "${asset.id}" at ${assetUrl} cannot be loaded due to CORS restrictions.`);
+            const errorMsg = `This video cannot be played. The format may not be supported or it may be blocked by CORS policy. Supported formats: MP4 (H.264), WebM. Please ensure the video URL allows cross-origin access.`;
+            console.error(`❌ Video Error: "${asset.id}" at ${assetUrl} - ${error.message}`);
             this.showAssetError(asset.id, errorMsg);
           }
-        }
-
-        // If unmuted playback fails, try muted
-        if (!this.assetVideo.muted) {
-          console.warn('Retrying video playback muted');
-          this.assetVideo.muted = true;
-          try {
-            await this.assetVideo.play();
-          } catch (retryError) {
-            console.error('Muted playback also failed:', retryError);
+        } else {
+          // If unmuted playback fails, try muted
+          if (!this.assetVideo.muted) {
+            console.warn('Retrying video playback muted');
+            this.assetVideo.muted = true;
+            try {
+              await this.assetVideo.play();
+            } catch (retryError) {
+              console.error('Muted playback also failed:', retryError);
+              const errorMsg = `Video playback failed: ${retryError.message}. Check console for details.`;
+              this.showAssetError(asset.id, errorMsg);
+            }
           }
         }
       }
