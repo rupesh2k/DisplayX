@@ -278,6 +278,35 @@ body {
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* Watermark */
+.watermark {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+  z-index: 10;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+.watermark strong {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Fade watermark slightly during transitions to be less intrusive */
+.asset.crossfade ~ .watermark,
+.asset.fade-to-black ~ .watermark {
+  opacity: 0.6;
+}
+
 /* Transitions (GPU-accelerated) */
 @keyframes crossfade {
   from {
